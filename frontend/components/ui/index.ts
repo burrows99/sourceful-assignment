@@ -16,5 +16,6 @@ export { CategoryTooltip } from './CategoryTooltip';
 export { PromptTextarea } from './PromptTextarea';
 export { FileUploadButton } from './FileUploadButton';
 export { SubmitButton } from './SubmitButton';
+export { PromptSubmitButton } from './PromptSubmitButton';
 export { FilePreview } from './FilePreview';
 export { PromptForm } from './PromptForm';
