@@ -66,9 +66,10 @@ export function Carousel({
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollRef.current) return;
     
-    const scrollAmount = 300;
+    // Width of one item (128px) + gap (20px = 5 * 4px in Tailwind)
+    const itemWidth = 128 + 20;
     scrollRef.current.scrollBy({
-      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      left: direction === 'left' ? -itemWidth : itemWidth,
       behavior: 'smooth',
     });
   };

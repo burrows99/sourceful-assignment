@@ -103,7 +103,7 @@ export function CategoryDialog({
                 icon={<Icon name={category.icon} />}
                 text={category.name}
                 isSelected={selectedCategory === category.id}
-                status={category.status}
+                statusBadge={category.statusBadge}
                 onClick={() => handleSelect(category.id)}
                 className="w-full"
                 aria-label={`Select ${category.name}`}

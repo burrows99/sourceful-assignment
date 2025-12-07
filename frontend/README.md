@@ -13,6 +13,9 @@ Fixed an issue where the mobile dialog would remain visible when resizing from m
 ### Carousel Navigation Button Visibility
 Implemented proper scroll navigation button visibility logic. The left navigation button now disappears when at the leftmost position, and the right navigation button disappears when at the rightmost position. This provides intuitive visual feedback about scroll boundaries and prevents unnecessary interaction with disabled navigation controls.
 
+### Product Mockups Button Glitch Fix
+Fixed an unintentional layout glitch where clicking the "Product mockups" button caused the entire page to shift horizontally from left to right. This behavior was unique to this button and not present in other category buttons. The implementation now ensures consistent behavior across all category selections without any unwanted page movement. This implementation does not include the background animations, which is likely the reason of the layout shift issue's fix.
+
 ## Getting Started
 
 First, run the development server:

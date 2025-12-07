@@ -80,7 +80,7 @@ export function CategoryCarousel({
               icon={<Icon name={category.icon} />}
               text={category.name}
               isSelected={selectedCategory === category.id}
-              status={category.status}
+              statusBadge={category.statusBadge}
               onClick={() => onCategorySelect(category.id)}
               aria-label={`Select ${category.name}`}
             />

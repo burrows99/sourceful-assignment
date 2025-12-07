@@ -12,6 +12,7 @@ export { Carousel } from './Carousel';
 export { CategoryCarousel } from './CategoryCarousel';
 export { CategoryDialog } from './CategoryDialog';
 export { CategoryActionDialog } from './CategoryActionDialog';
+export { CategoryTooltip } from './CategoryTooltip';
 export { PromptTextarea } from './PromptTextarea';
 export { FileUploadButton } from './FileUploadButton';
 export { SubmitButton } from './SubmitButton';
