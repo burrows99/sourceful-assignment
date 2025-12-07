@@ -8,7 +8,7 @@
 
 'use client';
 
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { CategoryCarousel } from './CategoryCarousel';
 import { PromptForm } from './PromptForm';
@@ -39,6 +39,8 @@ export function PromptBox({ initialCategory = 'packaging-design' }: PromptBoxPro
   const dialogCategoryData = categories.find(c => c.id === dialogCategoryId);
   const placeholder = selectedCategoryData?.placeholder || 'Describe your vision...';
   const infoMessage = selectedCategoryData?.infoMessage;
+  const authenticatedButtonText = selectedCategoryData?.buttonText?.authenticated || 'design';
+  const unauthenticatedButtonText = selectedCategoryData?.buttonText?.unauthenticated || 'design';
   const showSubmitButton = (!!selectedCategoryData?.placeholder || !!selectedCategoryData?.infoMessage) && !!selectedCategoryData?.buttonText;
 
   // Handle category selection - open dialog if needed
@@ -108,7 +110,8 @@ export function PromptBox({ initialCategory = 'packaging-design' }: PromptBoxPro
           placeholder={placeholder}
           previewUrl={previewUrl}
           showSubmitButton={showSubmitButton}
-          buttonText={selectedCategoryData?.buttonText || 'design'}
+          authenticatedButtonText={authenticatedButtonText}
+          unauthenticatedButtonText={unauthenticatedButtonText}
           infoMessage={infoMessage}
           onFileSelect={handleFileUpload}
           onFileRemove={handleRemoveFile}

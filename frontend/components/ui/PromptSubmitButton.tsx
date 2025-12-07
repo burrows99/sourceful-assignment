@@ -9,13 +9,17 @@
 import { type ButtonHTMLAttributes, type ReactNode } from 'react';
 
 interface PromptSubmitButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Button text to display */
-  text: string;
+  /** Text to display when authenticated */
+  authenticatedText: string;
+  /** Text to display when not authenticated */
+  unauthenticatedText: string;
+  /** Whether user is authenticated */
+  isAuthenticated: boolean;
   /** Whether the button is enabled */
   enabled?: boolean;
   /** Icon to display (optional) */
   icon?: ReactNode;
-  /** Credit cost badge content (optional) */
+  /** Credit cost badge content (optional, only shown when authenticated) */
   creditBadge?: {
     amount: number;
     icon?: ReactNode;
@@ -25,7 +29,9 @@ interface PromptSubmitButtonProps extends ButtonHTMLAttributes<HTMLButtonElement
 }
 
 export function PromptSubmitButton({
-  text,
+  authenticatedText,
+  unauthenticatedText,
+  isAuthenticated,
   enabled = true,
   icon,
   creditBadge,
@@ -34,6 +40,8 @@ export function PromptSubmitButton({
   type = 'submit',
   ...props
 }: PromptSubmitButtonProps) {
+  const displayText = isAuthenticated ? authenticatedText : unauthenticatedText;
+  
   return (
     <button
       data-button=""
@@ -52,11 +60,11 @@ export function PromptSubmitButton({
         data-text-label=""
         data-button-text=""
       >
-        {text}
+        {displayText}
       </span>
       
-      {/* Credit Badge */}
-      {creditBadge && (
+      {/* Credit Badge - Only shown when authenticated */}
+      {isAuthenticated && creditBadge && (
         <span className="inline-flex items-center border-2 rounded-pill !pr-2 h-24 px-12 [&>svg]:w-20 [&>svg]:h-20 bg-ui-lightest border-ui-lightest mx-4 [&>svg:first-child]:mr-2 [&>svg:last-child]:ml-2 !text-ui-grey-950 disabled:opacity-100 disabled:pointer-events-auto relative z-10 flex-shrink-0">
           <span
             className="font-space-grotesk tracking-normal text-inherit text-14 leading-20 md:text-14 md:leading-20 lg:text-15 lg:leading-20 xl:text-15 xl:leading-20 font-medium"

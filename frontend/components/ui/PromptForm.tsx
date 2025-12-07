@@ -7,6 +7,7 @@
 'use client';
 
 import { type FormEvent } from 'react';
+import { useAuth } from '@/lib/auth-context';
 import { PromptTextarea } from './PromptTextarea';
 import { FileUploadButton } from './FileUploadButton';
 import { SubmitButton } from './SubmitButton';
@@ -19,8 +20,10 @@ interface PromptFormProps {
   previewUrl: string | null;
   /** Whether to show submit button */
   showSubmitButton: boolean;
-  /** Button text for submit button */
-  buttonText: string;
+  /** Button text for submit button when authenticated */
+  authenticatedButtonText: string;
+  /** Button text for submit button when not authenticated */
+  unauthenticatedButtonText: string;
   /** Info message to display instead of textarea */
   infoMessage?: string;
   /** Callback when file is selected */
@@ -35,12 +38,14 @@ export function PromptForm({
   placeholder,
   previewUrl,
   showSubmitButton,
-  buttonText,
+  authenticatedButtonText,
+  unauthenticatedButtonText,
   infoMessage,
   onFileSelect,
   onFileRemove,
   onSubmit
 }: PromptFormProps) {
+  const { isAuthenticated } = useAuth();
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4 min-h-[168px] lg:gap-6">
       {/* Reference File Preview */}
@@ -90,7 +95,11 @@ export function PromptForm({
         
         {showSubmitButton && (
           <div>
-            <SubmitButton extendedText={buttonText}>
+            <SubmitButton 
+              authenticatedText={authenticatedButtonText}
+              unauthenticatedText={unauthenticatedButtonText}
+              isAuthenticated={isAuthenticated}
+            >
               Start
             </SubmitButton>
           </div>

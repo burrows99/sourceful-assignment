@@ -3,29 +3,40 @@
  * 
  * A gradient button with icon for submitting forms.
  * Features purple-to-blue gradient background with responsive text.
+ * Displays different text based on authentication state.
  */
 
 'use client';
 
 import { type ButtonHTMLAttributes } from 'react';
+import { useAuth } from '@/lib/auth-context';
 import { cn } from '@/lib/utils';
 
 interface SubmitButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Button text label */
   children: string;
-  /** Optional extended text visible on desktop */
-  extendedText?: string;
+  /** Extended text visible on desktop when authenticated */
+  authenticatedText?: string;
+  /** Extended text visible on desktop when not authenticated */
+  unauthenticatedText?: string;
 }
 
 export function SubmitButton({ 
   children,
-  extendedText,
+  authenticatedText,
+  unauthenticatedText,
   className,
   ...props 
 }: SubmitButtonProps) {
+  const { isAuthenticated } = useAuth();
+  
+  // Determine which extended text to show
+  const extendedText = isAuthenticated ? authenticatedText : unauthenticatedText;
+  
   return (
     <button
       type="submit"
+      disabled={!isAuthenticated}
       className={cn(
         "relative overflow-hidden appearance-none inline-flex items-center justify-center",
         "h-10 px-4 rounded-full",
