@@ -8,9 +8,10 @@
 
 'use client';
 
-import { type ButtonHTMLAttributes } from 'react';
+import { type ButtonHTMLAttributes, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useButtonState } from '@/hooks/useButtonState';
+import { ButtonTooltip } from './ButtonTooltip';
 
 export interface PromptSubmitButton {
   buttonText: string;
@@ -32,13 +33,21 @@ export function SubmitButton({
   className,
   ...props 
 }: SubmitButtonProps) {
-  const { buttonText, iconSide, isDisabled, showCreditBadge, credits } = useButtonState(promptSubmitButton);
+  const { buttonText, iconSide, isDisabled, showCreditBadge, credits, featureAvailable, buttonTextOverride } = useButtonState(promptSubmitButton);
+  const [showTooltip, setShowTooltip] = useState(false);
+  
+  const shouldShowTooltip = featureAvailable === false && buttonTextOverride;
   
   return (
-    <button
-      type="submit"
-      disabled={isDisabled}
-      className={cn(
+    <div 
+      className="relative inline-block w-full md:w-fit"
+      onMouseEnter={() => shouldShowTooltip && setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+    >
+      <button
+        type="submit"
+        disabled={isDisabled}
+        className={cn(
         "relative overflow-hidden appearance-none inline-flex items-center justify-center",
         "h-10 px-4 rounded-full",
         "bg-gradient-to-br from-[#8f00ff] from-10% to-[#0038ff] text-white",
@@ -121,6 +130,14 @@ export function SubmitButton({
           </svg>
         </span>
       )}
-    </button>
+      </button>
+      
+      {/* Tooltip */}
+      <ButtonTooltip
+        text={buttonTextOverride || ''}
+        subtext={promptSubmitButton?.requiredCredits ? `${promptSubmitButton.requiredCredits} credits required` : undefined}
+        show={shouldShowTooltip && showTooltip}
+      />
+    </div>
   );
 }

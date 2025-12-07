@@ -7,6 +7,7 @@
 export { Icon } from './Icon';
 export { IconButton } from './IconButton';
 export { PromptBox } from './PromptBox';
+export { ButtonTooltip } from './ButtonTooltip';
 export { ScrollButton } from './ScrollButton';
 export { Carousel } from './Carousel';
 export { CategoryCarousel } from './CategoryCarousel';

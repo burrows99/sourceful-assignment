@@ -55,5 +55,7 @@ export function useButtonState(promptSubmitButton?: PromptSubmitButton) {
     isDisabled,
     showCreditBadge,
     credits,
+    featureAvailable,
+    buttonTextOverride,
   };
 }
