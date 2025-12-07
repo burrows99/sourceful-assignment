@@ -10,6 +10,7 @@
 
 import { useState, type FormEvent } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { useAuth } from '@/lib/auth-context';
 import { CategoryCarousel } from './CategoryCarousel';
 import { PromptForm } from './PromptForm';
 import { CategoryActionDialog } from './CategoryActionDialog';
@@ -22,6 +23,7 @@ interface PromptBoxProps {
 export function PromptBox({ initialCategory = 'packaging-design' }: PromptBoxProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { isAuthenticated } = useAuth();
   
   // Validate initial category
   const validInitialCategory = initialCategory && categories.find(c => c.id === initialCategory) 
@@ -39,9 +41,14 @@ export function PromptBox({ initialCategory = 'packaging-design' }: PromptBoxPro
   const dialogCategoryData = categories.find(c => c.id === dialogCategoryId);
   const placeholder = selectedCategoryData?.placeholder || 'Describe your vision...';
   const infoMessage = selectedCategoryData?.infoMessage;
-  const authenticatedButtonText = selectedCategoryData?.buttonText?.authenticated || 'design';
-  const unauthenticatedButtonText = selectedCategoryData?.buttonText?.unauthenticated || 'design';
-  const showSubmitButton = (!!selectedCategoryData?.placeholder || !!selectedCategoryData?.infoMessage) && !!selectedCategoryData?.buttonText;
+  
+  // Select auth-based configuration
+  const authConfig = isAuthenticated 
+    ? selectedCategoryData?.authenticated 
+    : selectedCategoryData?.unauthenticated;
+  
+  const promptSubmitButton = authConfig?.promptSubmitButton;
+  const showSubmitButton = !!promptSubmitButton;
 
   // Handle category selection - open dialog if needed
   const handleCategorySelect = (categoryId: string) => {
@@ -110,8 +117,7 @@ export function PromptBox({ initialCategory = 'packaging-design' }: PromptBoxPro
           placeholder={placeholder}
           previewUrl={previewUrl}
           showSubmitButton={showSubmitButton}
-          authenticatedButtonText={authenticatedButtonText}
-          unauthenticatedButtonText={unauthenticatedButtonText}
+          promptSubmitButton={promptSubmitButton}
           infoMessage={infoMessage}
           onFileSelect={handleFileUpload}
           onFileRemove={handleRemoveFile}

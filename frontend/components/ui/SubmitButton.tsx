@@ -12,31 +12,36 @@ import { type ButtonHTMLAttributes } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { cn } from '@/lib/utils';
 
+export interface PromptSubmitButton {
+  buttonText: string;
+  iconSide?: 'left' | 'right';
+  shouldToggleDisabled?: boolean;
+  forceDisabled?: boolean;
+}
+
 interface SubmitButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Button text label */
-  children: string;
-  /** Extended text visible on desktop when authenticated */
-  authenticatedText?: string;
-  /** Extended text visible on desktop when not authenticated */
-  unauthenticatedText?: string;
+  /** Prompt submit button configuration */
+  promptSubmitButton?: PromptSubmitButton;
 }
 
 export function SubmitButton({ 
-  children,
-  authenticatedText,
-  unauthenticatedText,
+  promptSubmitButton,
   className,
   ...props 
 }: SubmitButtonProps) {
   const { isAuthenticated } = useAuth();
   
-  // Determine which extended text to show
-  const extendedText = isAuthenticated ? authenticatedText : unauthenticatedText;
+  // Get text from promptSubmitButton
+  const buttonText = promptSubmitButton?.buttonText || 'Start';
+  const iconSide = promptSubmitButton?.iconSide || 'right';
+  const shouldToggleDisabled = promptSubmitButton?.shouldToggleDisabled;
+  const forceDisabled = promptSubmitButton?.forceDisabled;
+  const isDisabled = forceDisabled || (shouldToggleDisabled && !isAuthenticated);
   
   return (
     <button
       type="submit"
-      disabled={!isAuthenticated}
+      disabled={isDisabled}
       className={cn(
         "relative overflow-hidden appearance-none inline-flex items-center justify-center",
         "h-10 px-4 rounded-full",
@@ -51,33 +56,49 @@ export function SubmitButton({
         "before:bg-gradient-to-br before:from-[#8f00ff] before:from-40% before:to-[#0038ff]",
         "disabled:before:!bg-none",
         "w-full md:w-fit",
+        "[&>svg]:relative [&>svg]:w-6 [&>svg]:h-6",
         className
       )}
       {...props}
     >
+      {iconSide === 'left' && (
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="1em" 
+          height="1em" 
+          fill="none" 
+          viewBox="0 0 48 48"
+          className="w-6 h-6 mr-2 relative"
+          aria-hidden="true"
+        >
+          <g fill="currentColor">
+            <path fillRule="evenodd" d="M8.56 22v4C16 26 22.72 33.645 22.72 44h4c0-10.355 6.722-18 14.16-18v-4c-7.438 0-14.16-7.645-14.16-18h-4c0 10.355-6.721 18-14.16 18Zm24.704 2c-3.73 2.083-6.715 5.644-8.544 9.974-1.828-4.33-4.813-7.891-8.543-9.974 3.73-2.083 6.715-5.644 8.544-9.974 1.828 4.33 4.813 7.891 8.543 9.974Z" clipRule="evenodd"/>
+            <path d="M42.36 8.28a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM9 14.3a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM38.02 39.42a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+          </g>
+        </svg>
+      )}
       <span className="font-space-grotesk tracking-normal text-inherit text-sm leading-5 md:text-sm md:leading-5 lg:text-[15px] lg:leading-5 xl:text-[15px] xl:leading-5 font-medium inline-flex px-0.5 relative">
-        {children}
-        {extendedText && (
-          <span className="hidden md:inline">&nbsp;{extendedText}</span>
-        )}
+        {buttonText}
       </span>
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        width="24" 
-        height="24" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        className="w-6 h-6 ml-2 relative"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <path d="m12 16 4-4-4-4" />
-        <path d="M8 12h8" />
-      </svg>
+      {iconSide === 'right' && (
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="24" 
+          height="24" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          className="w-6 h-6 ml-2 relative"
+          aria-hidden="true"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <path d="m12 16 4-4-4-4" />
+          <path d="M8 12h8" />
+        </svg>
+      )}
     </button>
   );
 }
