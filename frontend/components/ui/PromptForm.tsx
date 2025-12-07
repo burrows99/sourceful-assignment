@@ -7,7 +7,6 @@
 'use client';
 
 import { type FormEvent } from 'react';
-import { useAuth } from '@/lib/auth-context';
 import type { PromptSubmitButton } from './SubmitButton';
 import { PromptTextarea } from './PromptTextarea';
 import { FileUploadButton } from './FileUploadButton';
@@ -43,7 +42,6 @@ export function PromptForm({
   onFileRemove,
   onSubmit
 }: PromptFormProps) {
-  const { isAuthenticated } = useAuth();
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4 min-h-[168px] lg:gap-6">
       {/* Reference File Preview */}

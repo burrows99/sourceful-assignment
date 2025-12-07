@@ -8,9 +8,9 @@
 
 'use client';
 
-import { useState, type FormEvent } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { type FormEvent } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import { useCategorySelection, useFileUpload } from '@/hooks';
 import { CategoryCarousel } from './CategoryCarousel';
 import { PromptForm } from './PromptForm';
 import { CategoryActionDialog } from './CategoryActionDialog';
@@ -21,20 +21,23 @@ interface PromptBoxProps {
 }
 
 export function PromptBox({ initialCategory = 'packaging-design' }: PromptBoxProps) {
-  const router = useRouter();
-  const pathname = usePathname();
   const { isAuthenticated } = useAuth();
   
-  // Validate initial category
-  const validInitialCategory = initialCategory && categories.find(c => c.id === initialCategory) 
-    ? initialCategory 
-    : 'packaging-design';
+  // Category selection and dialog management
+  const {
+    selectedCategory,
+    dialogCategoryId,
+    isActionDialogOpen,
+    handleCategorySelect,
+    closeDialog,
+  } = useCategorySelection(initialCategory);
   
-  const [selectedCategory, setSelectedCategory] = useState<string>(validInitialCategory);
-  const [isActionDialogOpen, setIsActionDialogOpen] = useState(false);
-  const [dialogCategoryId, setDialogCategoryId] = useState<string>('');
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  // File upload management
+  const {
+    previewUrl,
+    handleFileUpload,
+    handleRemoveFile,
+  } = useFileUpload();
 
   // Get selected category data
   const selectedCategoryData = categories.find(c => c.id === selectedCategory);
@@ -49,46 +52,6 @@ export function PromptBox({ initialCategory = 'packaging-design' }: PromptBoxPro
   
   const promptSubmitButton = authConfig?.promptSubmitButton;
   const showSubmitButton = !!promptSubmitButton;
-
-  // Handle category selection - open dialog if needed
-  const handleCategorySelect = (categoryId: string) => {
-    const category = categories.find(c => c.id === categoryId);
-    
-    // Always update the URL
-    router.push(`${pathname}?category=${categoryId}`, { scroll: false });
-    
-    if (category?.showDialog) {
-      // Open dialog but don't change selection
-      setDialogCategoryId(categoryId);
-      setIsActionDialogOpen(true);
-    } else {
-      // Normal selection
-      setSelectedCategory(categoryId);
-    }
-  };
-
-  const handleFileUpload = (file: File) => {
-    setUploadedFile(file);
-    
-    // Create preview URL
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-    
-    // Cleanup old URL if exists
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
-  };
-
-  const handleRemoveFile = () => {
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-    }
-    setUploadedFile(null);
-    setPreviewUrl(null);
-  };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -128,7 +91,7 @@ export function PromptBox({ initialCategory = 'packaging-design' }: PromptBoxPro
       {/* Category Action Dialog */}
       <CategoryActionDialog
         isOpen={isActionDialogOpen}
-        onClose={() => setIsActionDialogOpen(false)}
+        onClose={closeDialog}
         categoryName={dialogCategoryData?.name || ''}
       />
     </div>

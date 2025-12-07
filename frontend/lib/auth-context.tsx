@@ -21,6 +21,7 @@ export interface AuthContextType {
   credits: number;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => void;
+  setCredits: (credits: number) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -44,6 +45,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const setCredits = (credits: number) => {
+    if (user) {
+      setUser({ ...user, credits });
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -52,6 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         credits: user?.credits ?? 0,
         signIn,
         signOut,
+        setCredits,
       }}
     >
       {children}

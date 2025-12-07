@@ -9,8 +9,8 @@
 'use client';
 
 import { type ButtonHTMLAttributes } from 'react';
-import { useAuth } from '@/lib/auth-context';
 import { cn } from '@/lib/utils';
+import { useButtonState } from '@/hooks/useButtonState';
 
 export interface PromptSubmitButton {
   buttonText: string;
@@ -32,24 +32,7 @@ export function SubmitButton({
   className,
   ...props 
 }: SubmitButtonProps) {
-  const { isAuthenticated, credits } = useAuth();
-  
-  // Get feature availability result if available
-  const featureAvailable = promptSubmitButton?.isFeatureAvailable?.(credits) ?? null;
-  
-  // Determine final state based on auth and feature availability
-  const finalState = featureAvailable !== null ? featureAvailable : isAuthenticated;
-  
-  // Get text and icon side from promptSubmitButton
-  const baseButtonText = promptSubmitButton?.buttonText || 'Start';
-  const buttonTextOverride = promptSubmitButton?.buttonTextOverrideIfLowCredits;
-  const buttonText = (featureAvailable === false && buttonTextOverride) ? buttonTextOverride : baseButtonText;
-  const iconSide = promptSubmitButton?.iconSide || (finalState ? 'right' : 'left');
-  const shouldToggleDisabled = promptSubmitButton?.shouldToggleDisabled;
-  const forceDisabled = promptSubmitButton?.forceDisabled;
-  const isDisabled = forceDisabled || (shouldToggleDisabled && !isAuthenticated) || (featureAvailable !== null && !featureAvailable);
-  const showCreditBadge = !!promptSubmitButton?.isFeatureAvailable;
-  const requiredCredits = promptSubmitButton?.requiredCredits || 10;
+  const { buttonText, iconSide, isDisabled, showCreditBadge, credits } = useButtonState(promptSubmitButton);
   
   return (
     <button
