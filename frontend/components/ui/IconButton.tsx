@@ -17,6 +17,11 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   text: string;
   /** Whether this button is currently selected */
   isSelected?: boolean;
+  /** Status badge configuration */
+  status?: {
+    text: string;
+    color: 'gradient' | 'orange';
+  };
 }
 
 const baseStyles = `
@@ -47,9 +52,17 @@ export function IconButton({
   icon,
   text,
   isSelected = false,
+  status,
   className,
   ...props
 }: IconButtonProps) {
+  const getBadgeColorClass = (color: 'gradient' | 'orange') => {
+    if (color === 'orange') {
+      return 'text-orange-500';
+    }
+    return 'text-transparent bg-clip-text bg-gradient-to-r from-violet-500 via-blue-500 to-green-500';
+  };
+
   return (
     <button
       type="button"
@@ -69,6 +82,18 @@ export function IconButton({
       <span className="text-[10px] md:text-[10px] lg:text-[11px] xl:text-xs leading-3 md:leading-3 lg:leading-4 xl:leading-4 text-center text-neutral-800">
         {text}
       </span>
+
+      {status && (
+        <span 
+          data-text-label="" 
+          className={cn(
+            "font-space-grotesk tracking-tighter text-[10px] leading-3 md:text-[10px] md:leading-3 lg:text-[11px] lg:leading-4 xl:text-xs xl:leading-4 font-semibold",
+            getBadgeColorClass(status.color)
+          )}
+        >
+          {status.text}
+        </span>
+      )}
     </button>
   );
 }
