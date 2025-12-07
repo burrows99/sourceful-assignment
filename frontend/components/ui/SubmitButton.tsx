@@ -27,18 +27,24 @@ export function SubmitButton({
     <button
       type="submit"
       className={cn(
-        "relative overflow-hidden inline-flex items-center justify-center",
+        "relative overflow-hidden appearance-none inline-flex items-center justify-center",
         "h-10 px-4 rounded-full",
-        "bg-linear-to-br from-purple-600 to-blue-600 text-white",
-        "hover:from-purple-700 hover:to-blue-700",
+        "bg-gradient-to-br from-[#8f00ff] from-10% to-[#0038ff] text-white",
+        "disabled:from-gray-50 disabled:to-gray-50 disabled:text-gray-400",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500",
-        "transition-all duration-200",
+        "transition duration-200",
         "text-sm font-medium whitespace-nowrap",
+        "before:opacity-0 hover:before:opacity-100 focus:before:opacity-100",
+        "before:transition-opacity before:duration-200",
+        "before:absolute before:inset-0",
+        "before:bg-gradient-to-br before:from-[#8f00ff] before:from-40% before:to-[#0038ff]",
+        "disabled:before:!bg-none",
+        "w-full md:w-fit",
         className
       )}
       {...props}
     >
-      <span className="relative">
+      <span className="font-space-grotesk tracking-normal text-inherit text-sm leading-5 md:text-sm md:leading-5 lg:text-[15px] lg:leading-5 xl:text-[15px] xl:leading-5 font-medium inline-flex px-0.5 relative">
         {children}
         {extendedText && (
           <span className="hidden md:inline">&nbsp;{extendedText}</span>
@@ -54,7 +60,7 @@ export function SubmitButton({
         strokeWidth="2" 
         strokeLinecap="round" 
         strokeLinejoin="round" 
-        className="w-6 h-6 ml-2"
+        className="w-6 h-6 ml-2 relative"
         aria-hidden="true"
       >
         <circle cx="12" cy="12" r="10" />

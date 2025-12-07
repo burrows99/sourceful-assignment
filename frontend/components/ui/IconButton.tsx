@@ -26,7 +26,7 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const baseStyles = `
   flex flex-col items-center justify-center gap-2
-  w-32 h-26 rounded-[32px]
+  w-32 h-26 rounded-4xl
   text-base leading-6 font-normal
   cursor-pointer appearance-none
   transition-colors duration-200
@@ -34,7 +34,7 @@ const baseStyles = `
 `;
 
 const iconStyles = `
-  [&_svg]:w-[30px] [&_svg]:h-[30px] 
+  [&_svg]:w-6 [&_svg]:h-6 
   [&_svg]:block [&_svg]:stroke-2
 `;
 
@@ -45,6 +45,7 @@ const selectedStyles = `
 
 const defaultStyles = `
   bg-[rgb(248,248,248)]
+  hover:bg-neutral-100
   active:bg-neutral-100
 `;
 
@@ -74,11 +75,11 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         )}
         {...props}
       >
-        <div className="w-[30px] h-[30px] flex items-center justify-center">
+        <div className="w-6 h-6 flex items-center justify-center">
           {icon}
         </div>
 
-        <span className="text-[10px] md:text-[10px] lg:text-[11px] xl:text-xs leading-3 md:leading-3 lg:leading-4 xl:leading-4 text-center text-neutral-800">
+        <span className="text-[10px] md:text-[10px] lg:text-[11px] xl:text-xs leading-3 md:leading-3 lg:leading-4 xl:leading-4 text-center text-neutral-800 font-space-grotesk tracking-normal font-normal">
           {text}
         </span>
 
@@ -86,7 +87,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
           <span 
             data-text-label="" 
             className={cn(
-              "font-space-grotesk tracking-tighter text-[10px] leading-3 md:text-[10px] md:leading-3 lg:text-[11px] lg:leading-4 xl:text-xs xl:leading-4 font-semibold",
+              "font-space-grotesk tracking-normal text-[10px] leading-3 md:text-[10px] md:leading-3 lg:text-[11px] lg:leading-4 xl:text-xs xl:leading-4 font-medium",
               badgeColorClass
             )}
           >
