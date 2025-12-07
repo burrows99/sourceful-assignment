@@ -8,14 +8,27 @@
 
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { CategoryCarousel } from './CategoryCarousel';
 import { PromptForm } from './PromptForm';
 import { CategoryActionDialog } from './CategoryActionDialog';
 import { categories } from '@/lib/constants';
 
-export function PromptBox() {
-  const [selectedCategory, setSelectedCategory] = useState<string>('packaging-design');
+interface PromptBoxProps {
+  initialCategory?: string;
+}
+
+export function PromptBox({ initialCategory = 'packaging-design' }: PromptBoxProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  
+  // Validate initial category
+  const validInitialCategory = initialCategory && categories.find(c => c.id === initialCategory) 
+    ? initialCategory 
+    : 'packaging-design';
+  
+  const [selectedCategory, setSelectedCategory] = useState<string>(validInitialCategory);
   const [isActionDialogOpen, setIsActionDialogOpen] = useState(false);
   const [dialogCategoryId, setDialogCategoryId] = useState<string>('');
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -25,13 +38,18 @@ export function PromptBox() {
   const selectedCategoryData = categories.find(c => c.id === selectedCategory);
   const dialogCategoryData = categories.find(c => c.id === dialogCategoryId);
   const placeholder = selectedCategoryData?.placeholder || 'Describe your vision...';
-  const showSubmitButton = !!selectedCategoryData?.placeholder && !!selectedCategoryData?.buttonText;
+  const infoMessage = selectedCategoryData?.infoMessage;
+  const showSubmitButton = (!!selectedCategoryData?.placeholder || !!selectedCategoryData?.infoMessage) && !!selectedCategoryData?.buttonText;
 
   // Handle category selection - open dialog if needed
   const handleCategorySelect = (categoryId: string) => {
     const category = categories.find(c => c.id === categoryId);
+    
+    // Always update the URL
+    router.push(`${pathname}?category=${categoryId}`, { scroll: false });
+    
     if (category?.showDialog) {
-      // Don't change selection, just open dialog
+      // Open dialog but don't change selection
       setDialogCategoryId(categoryId);
       setIsActionDialogOpen(true);
     } else {
@@ -91,6 +109,7 @@ export function PromptBox() {
           previewUrl={previewUrl}
           showSubmitButton={showSubmitButton}
           buttonText={selectedCategoryData?.buttonText || 'design'}
+          infoMessage={infoMessage}
           onFileSelect={handleFileUpload}
           onFileRemove={handleRemoveFile}
           onSubmit={handleSubmit}
