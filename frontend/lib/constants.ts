@@ -70,7 +70,10 @@ export const categories: readonly Category[] = [
     authenticated: {
       promptSubmitButton: {
         buttonText: 'Start for free',
-        iconSide: 'right',
+        iconSide: 'left',
+        isFeatureAvailable: (credits) => credits >= 10,
+        requiredCredits: 10,
+        buttonTextOverrideIfLowCredits: 'Get credits',
       },
     },
     unauthenticated: {

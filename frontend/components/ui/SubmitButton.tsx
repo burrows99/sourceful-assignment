@@ -17,6 +17,9 @@ export interface PromptSubmitButton {
   iconSide?: 'left' | 'right';
   shouldToggleDisabled?: boolean;
   forceDisabled?: boolean;
+  isFeatureAvailable?: (credits: number) => boolean;
+  requiredCredits?: number;
+  buttonTextOverrideIfLowCredits?: string;
 }
 
 interface SubmitButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -29,14 +32,24 @@ export function SubmitButton({
   className,
   ...props 
 }: SubmitButtonProps) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, credits } = useAuth();
   
-  // Get text from promptSubmitButton
-  const buttonText = promptSubmitButton?.buttonText || 'Start';
-  const iconSide = promptSubmitButton?.iconSide || 'right';
+  // Get feature availability result if available
+  const featureAvailable = promptSubmitButton?.isFeatureAvailable?.(credits) ?? null;
+  
+  // Determine final state based on auth and feature availability
+  const finalState = featureAvailable !== null ? featureAvailable : isAuthenticated;
+  
+  // Get text and icon side from promptSubmitButton
+  const baseButtonText = promptSubmitButton?.buttonText || 'Start';
+  const buttonTextOverride = promptSubmitButton?.buttonTextOverrideIfLowCredits;
+  const buttonText = (featureAvailable === false && buttonTextOverride) ? buttonTextOverride : baseButtonText;
+  const iconSide = promptSubmitButton?.iconSide || (finalState ? 'right' : 'left');
   const shouldToggleDisabled = promptSubmitButton?.shouldToggleDisabled;
   const forceDisabled = promptSubmitButton?.forceDisabled;
-  const isDisabled = forceDisabled || (shouldToggleDisabled && !isAuthenticated);
+  const isDisabled = forceDisabled || (shouldToggleDisabled && !isAuthenticated) || (featureAvailable !== null && !featureAvailable);
+  const showCreditBadge = !!promptSubmitButton?.isFeatureAvailable;
+  const requiredCredits = promptSubmitButton?.requiredCredits || 10;
   
   return (
     <button
@@ -80,7 +93,7 @@ export function SubmitButton({
       <span className="font-space-grotesk tracking-normal text-inherit text-sm leading-5 md:text-sm md:leading-5 lg:text-[15px] lg:leading-5 xl:text-[15px] xl:leading-5 font-medium inline-flex px-0.5 relative">
         {buttonText}
       </span>
-      {iconSide === 'right' && (
+      {iconSide === 'right' && !showCreditBadge && (
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
           width="24" 
@@ -98,6 +111,32 @@ export function SubmitButton({
           <path d="m12 16 4-4-4-4" />
           <path d="M8 12h8" />
         </svg>
+      )}
+      {showCreditBadge && (
+        <span className="inline-flex items-center border-2 rounded-full !pr-2 h-6 px-3 bg-white border-white mx-1 text-gray-950 disabled:opacity-100 disabled:pointer-events-auto relative z-10 flex-shrink-0">
+          <span className="font-space-grotesk tracking-normal text-inherit text-sm leading-5 font-medium">
+            {credits}
+            <span className="sr-only">credits available</span>
+          </span>
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            width="24" 
+            height="24" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor" 
+            strokeWidth="2" 
+            strokeLinecap="round" 
+            strokeLinejoin="round"
+            className="w-5 h-5 ml-0.5"
+            aria-hidden="true"
+          >
+            <circle cx="8" cy="8" r="6" />
+            <path d="M18.09 10.37A6 6 0 1 1 10.34 18" />
+            <path d="M7 6h1v4" />
+            <path d="m16.71 13.88.7.71-2.82 2.82" />
+          </svg>
+        </span>
       )}
     </button>
   );

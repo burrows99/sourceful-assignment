@@ -15,7 +15,7 @@ interface User {
   credits: number;
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   credits: number;
@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       id: '1',
       name: 'Test User',
       email: email,
-      credits: 10,
+      credits: 9,
     };
     setUser(mockUser);
   };
