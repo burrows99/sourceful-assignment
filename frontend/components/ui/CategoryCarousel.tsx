@@ -8,7 +8,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Carousel } from './Carousel';
 import { IconButton } from './IconButton';
 import { Icon } from './Icon';
@@ -27,8 +27,23 @@ export function CategoryCarousel({
   onCategorySelect 
 }: CategoryCarouselProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const buttonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
   
   const selectedCategoryData = categories.find(c => c.id === selectedCategory);
+
+  const handleCategoryClick = (categoryId: string) => {
+    // Scroll the clicked button into view
+    const buttonElement = buttonRefs.current[categoryId];
+    if (buttonElement) {
+      buttonElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center'
+      });
+    }
+    
+    onCategorySelect(categoryId);
+  };
 
   return (
     <>
@@ -77,11 +92,12 @@ export function CategoryCarousel({
           {categories.map((category) => (
             <IconButton
               key={category.id}
+              ref={(el) => buttonRefs.current[category.id] = el}
               icon={<Icon name={category.icon} />}
               text={category.name}
               isSelected={selectedCategory === category.id}
               statusBadge={category.statusBadge}
-              onClick={() => onCategorySelect(category.id)}
+              onClick={() => handleCategoryClick(category.id)}
               aria-label={`Select ${category.name}`}
             />
           ))}

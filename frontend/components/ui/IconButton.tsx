@@ -7,7 +7,7 @@
 
 'use client';
 
-import { type ReactNode, type ButtonHTMLAttributes } from 'react';
+import { type ReactNode, type ButtonHTMLAttributes, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -39,7 +39,7 @@ const iconStyles = `
 `;
 
 const selectedStyles = `
-  bg-blue-100 
+  bg-[rgb(213_237_255)] 
   active:bg-blue-200
 `;
 
@@ -48,49 +48,54 @@ const defaultStyles = `
   active:bg-neutral-100
 `;
 
-export function IconButton({
-  icon,
-  text,
-  isSelected = false,
-  statusBadge,
-  className,
-  ...props
-}: IconButtonProps) {
-  const badgeColorClass = statusBadge?.color === 'orange'
-    ? 'text-orange-500'
-    : 'text-transparent bg-clip-text bg-gradient-to-r from-violet-500 via-blue-500 to-green-500';
+export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
+  ({
+    icon,
+    text,
+    isSelected = false,
+    statusBadge,
+    className,
+    ...props
+  }, ref) => {
+    const badgeColorClass = statusBadge?.color === 'orange'
+      ? 'text-orange-500'
+      : 'text-transparent bg-clip-text bg-gradient-to-r from-violet-500 via-blue-500 to-green-500';
 
-  return (
-    <button
-      type="button"
-      data-state={isSelected ? 'selected' : 'default'}
-      className={cn(
-        baseStyles,
-        iconStyles,
-        isSelected ? selectedStyles : defaultStyles,
-        className
-      )}
-      {...props}
-    >
-      <div className="w-[30px] h-[30px] flex items-center justify-center">
-        {icon}
-      </div>
+    return (
+      <button
+        ref={ref}
+        type="button"
+        data-state={isSelected ? 'selected' : 'default'}
+        className={cn(
+          baseStyles,
+          iconStyles,
+          isSelected ? selectedStyles : defaultStyles,
+          className
+        )}
+        {...props}
+      >
+        <div className="w-[30px] h-[30px] flex items-center justify-center">
+          {icon}
+        </div>
 
-      <span className="text-[10px] md:text-[10px] lg:text-[11px] xl:text-xs leading-3 md:leading-3 lg:leading-4 xl:leading-4 text-center text-neutral-800">
-        {text}
-      </span>
-
-      {statusBadge && (
-        <span 
-          data-text-label="" 
-          className={cn(
-            "font-space-grotesk tracking-tighter text-[10px] leading-3 md:text-[10px] md:leading-3 lg:text-[11px] lg:leading-4 xl:text-xs xl:leading-4 font-semibold",
-            badgeColorClass
-          )}
-        >
-          {statusBadge.text}
+        <span className="text-[10px] md:text-[10px] lg:text-[11px] xl:text-xs leading-3 md:leading-3 lg:leading-4 xl:leading-4 text-center text-neutral-800">
+          {text}
         </span>
-      )}
-    </button>
-  );
-}
+
+        {statusBadge && (
+          <span 
+            data-text-label="" 
+            className={cn(
+              "font-space-grotesk tracking-tighter text-[10px] leading-3 md:text-[10px] md:leading-3 lg:text-[11px] lg:leading-4 xl:text-xs xl:leading-4 font-semibold",
+              badgeColorClass
+            )}
+          >
+            {statusBadge.text}
+          </span>
+        )}
+      </button>
+    );
+  }
+);
+
+IconButton.displayName = 'IconButton';

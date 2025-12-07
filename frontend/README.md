@@ -16,6 +16,8 @@ Implemented proper scroll navigation button visibility logic. The left navigatio
 ### Product Mockups Button Glitch Fix
 Fixed an unintentional layout glitch where clicking the "Product mockups" button caused the entire page to shift horizontally from left to right. This behavior was unique to this button and not present in other category buttons. The implementation now ensures consistent behavior across all category selections without any unwanted page movement. This implementation does not include the background animations, which is likely the reason of the layout shift issue's fix.
 
+![Carousel Navigation](public/images/improvements/Screenshot 2025-12-07 at 8.49.19 PM.png)
+
 ## Getting Started
 
 First, run the development server:
