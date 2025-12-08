@@ -8,13 +8,13 @@
 
 'use client';
 
-import { type FormEvent } from 'react';
+import { type FormEvent, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useCategorySelection, useFileUpload } from '@/hooks';
 import { CategoryCarousel } from './CategoryCarousel';
 import { PromptForm } from './PromptForm';
 import { CategoryActionDialog } from './CategoryActionDialog';
-import { categories } from '@/lib/constants';
+import { categories, type ImageVariationsCount } from '@/lib/constants';
 
 interface PromptBoxProps {
   initialCategory?: string;
@@ -39,6 +39,9 @@ export function PromptBox({ initialCategory = 'packaging-design' }: PromptBoxPro
     handleRemoveFile,
   } = useFileUpload();
 
+  // Image variations state
+  const [variationsCount, setVariationsCount] = useState<ImageVariationsCount>(5);
+
   // Get selected category data
   const selectedCategoryData = categories.find(c => c.id === selectedCategory);
   const dialogCategoryData = categories.find(c => c.id === dialogCategoryId);
@@ -52,6 +55,7 @@ export function PromptBox({ initialCategory = 'packaging-design' }: PromptBoxPro
   
   const promptSubmitButton = authConfig?.promptSubmitButton;
   const showSubmitButton = !!promptSubmitButton;
+  const showVariationsSelector = authConfig?.showVariationsSelector || false;
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -61,6 +65,7 @@ export function PromptBox({ initialCategory = 'packaging-design' }: PromptBoxPro
     // TODO: Implement form submission logic
     console.log('Selected category:', selectedCategory);
     console.log('Prompt:', prompt);
+    console.log('Variations count:', variationsCount);
   };
 
   return (
@@ -82,6 +87,9 @@ export function PromptBox({ initialCategory = 'packaging-design' }: PromptBoxPro
           showSubmitButton={showSubmitButton}
           promptSubmitButton={promptSubmitButton}
           infoMessage={infoMessage}
+          showVariationsSelector={showVariationsSelector}
+          variationsCount={variationsCount}
+          onVariationsChange={setVariationsCount}
           onFileSelect={handleFileUpload}
           onFileRemove={handleRemoveFile}
           onSubmit={handleSubmit}

@@ -8,10 +8,12 @@
 
 import { type FormEvent } from 'react';
 import type { PromptSubmitButton } from './SubmitButton';
+import type { ImageVariationsCount } from '@/lib/constants';
 import { PromptTextarea } from './PromptTextarea';
 import { FileUploadButton } from './FileUploadButton';
 import { SubmitButton } from './SubmitButton';
 import { FilePreview } from './FilePreview';
+import { VariationsSelector } from './VariationsSelector';
 
 interface PromptFormProps {
   /** Placeholder text for textarea */
@@ -24,6 +26,12 @@ interface PromptFormProps {
   promptSubmitButton?: PromptSubmitButton;
   /** Info message to display instead of textarea */
   infoMessage?: string;
+  /** Whether to show variations selector */
+  showVariationsSelector?: boolean;
+  /** Current variations count */
+  variationsCount?: ImageVariationsCount;
+  /** Callback when variations count changes */
+  onVariationsChange?: (count: ImageVariationsCount) => void;
   /** Callback when file is selected */
   onFileSelect: (file: File) => void;
   /** Callback when file is removed */
@@ -38,6 +46,9 @@ export function PromptForm({
   showSubmitButton,
   promptSubmitButton,
   infoMessage,
+  showVariationsSelector = false,
+  variationsCount = 5,
+  onVariationsChange,
   onFileSelect,
   onFileRemove,
   onSubmit
@@ -90,7 +101,13 @@ export function PromptForm({
         </div>
         
         {showSubmitButton && promptSubmitButton && (
-          <div>
+          <div className="flex items-center gap-2">
+            {showVariationsSelector && onVariationsChange && (
+              <VariationsSelector 
+                value={variationsCount} 
+                onChange={onVariationsChange}
+              />
+            )}
             <SubmitButton promptSubmitButton={promptSubmitButton} />
           </div>
         )}

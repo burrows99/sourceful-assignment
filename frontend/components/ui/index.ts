@@ -20,3 +20,4 @@ export { SubmitButton } from './SubmitButton';
 export { PromptSubmitButton } from './PromptSubmitButton';
 export { FilePreview } from './FilePreview';
 export { PromptForm } from './PromptForm';
+export { VariationsSelector } from './VariationsSelector';

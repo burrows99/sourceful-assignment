@@ -57,7 +57,7 @@ export function ButtonTooltip({ text, subtext, image, show, targetElement }: But
         isVisible ? "opacity-100" : "opacity-0",
         image 
           ? "bg-black rounded-4xl overflow-hidden p-3" 
-          : "bg-gray-900 px-4 py-2.5 rounded-lg whitespace-nowrap"
+          : "bg-gray-900 px-4 py-2.5 rounded-2xl whitespace-nowrap"
       )}
       style={{
         top: `${top}px`,

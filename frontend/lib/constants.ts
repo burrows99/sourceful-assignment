@@ -12,9 +12,11 @@ export interface Category {
   icon: string;
   authenticated: {
     promptSubmitButton?: PromptSubmitButton;
+    showVariationsSelector?: boolean;
   };
   unauthenticated: {
     promptSubmitButton?: PromptSubmitButton;
+    showVariationsSelector?: boolean;
   };
   placeholder?: string;
   infoMessage?: string;
@@ -26,6 +28,9 @@ export interface Category {
   tooltipImage?: string;
   tooltipDescription?: string;
 }
+
+export const IMAGE_VARIATIONS_OPTIONS = [1, 2, 3, 4, 5] as const;
+export type ImageVariationsCount = typeof IMAGE_VARIATIONS_OPTIONS[number];
 
 export const categories: readonly Category[] = [
   { 
@@ -81,6 +86,7 @@ export const categories: readonly Category[] = [
         requiredCredits: 10,
         buttonTextOverrideIfLowCredits: 'Get credits',
       },
+      showVariationsSelector: true,
     },
     unauthenticated: {
       promptSubmitButton: {
