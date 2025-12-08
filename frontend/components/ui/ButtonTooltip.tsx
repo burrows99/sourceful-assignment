@@ -53,7 +53,7 @@ export function ButtonTooltip({ text, subtext, image, show, targetElement }: But
     <div 
       className={cn(
         "fixed text-white shadow-2xl z-60 pointer-events-none",
-        "transition-opacity duration-200 ease-out",
+        "transition-opacity duration-600 ease-out",
         isVisible ? "opacity-100" : "opacity-0",
         image 
           ? "bg-black rounded-4xl overflow-hidden p-3" 
