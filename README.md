@@ -1,72 +1,63 @@
-# sourceful-assignment
+# Sourceful Assignment
 
-## Docker Setup
+Full-stack image generation application with FastAPI backend, Next.js frontend, and PostgreSQL database.
 
-### Prerequisites
-- Docker installed on your system
-- Docker Compose installed
+---
 
-### Running with Docker Compose
+## Quick Start
 
-1. **Build and start all services:**
 ```bash
-docker-compose up --build
-```
-
-2. **Run in detached mode (background):**
-```bash
+# Start all services
 docker-compose up -d
-```
 
-3. **Stop all services:**
-```bash
+# View logs
+docker-compose logs -f
+
+# Stop services
 docker-compose down
 ```
 
-4. **View logs:**
-```bash
-docker-compose logs -f
-```
+### Access Services
 
-### Access the Application
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:8000
-- **API Documentation**: http://localhost:8000/docs
-- **PostgreSQL**: localhost:5432 (user: sourceful, password: sourceful123)
-- **pgAdmin**: http://localhost:5050 (email: admin@sourceful.com, password: admin123)
+| Service | URL | Credentials |
+|---------|-----|-------------|
+| **Frontend** | http://localhost:3000 | - |
+| **Backend API** | http://localhost:8000 | - |
+| **API Docs** | http://localhost:8000/docs | - |
+| **pgAdmin** | http://localhost:5050 | admin@admin.com:admin |
 
-### pgAdmin Setup
+---
+
+## Database Visualization (pgAdmin)
 
 1. Open http://localhost:5050
-2. Login with email: `admin@sourceful.com` and password: `admin123`
-3. Add server:
-   - Name: Sourceful DB
-   - Host: postgres
-   - Port: 5432
-   - Database: sourceful_db
-   - Username: sourceful
-   - Password: sourceful123
+2. Login: `admin@admin.com` / `admin`
+3. Expand **"Servers"** → Click **"Sourceful PostgreSQL"**
+4. Enter password: `postgres` (check "Save Password")
+5. Navigate to: **Databases → postgres → Schemas → public → Tables → jobs**
 
-### Database Migrations
+---
 
-The database is automatically initialized on startup. To manually run migrations:
+## Testing
+
+**Coverage**: 28 tests, 93% overall
 
 ```bash
-docker-compose exec backend bash -c "cd /app && alembic upgrade head"
+# Run all tests
+docker exec sourceful-backend pytest
+
+# Run with coverage report
+docker exec sourceful-backend pytest --cov=. --cov-report=html
+open backend/htmlcov/index.html
+
+# Run specific test types
+docker exec sourceful-backend pytest -m unit
+docker exec sourceful-backend pytest -m integration
 ```
 
-To create a new migration:
+---
 
-```bash
-docker-compose exec backend bash -c "cd /app && alembic revision -m 'your migration message'"
-```
-
-### Development Mode
-For development with hot reload, you can still run the services locally:
-- Frontend: `cd frontend && npm run dev`
-- Backend: `cd backend && venv/bin/python -m fastapi dev main.py`
-
-## Improvements Implemented
+## UI Improvements Implemented
 
 ### Mobile Dialog - Selected State Indicator
 The mobile category selection dialog displays the currently selected category with visual highlighting, allowing users to see their active selection while browsing all available options. This improves user awareness and provides clear context when choosing a new category.
@@ -78,9 +69,26 @@ Fixed an issue where the mobile dialog would remain visible when resizing from m
 Implemented proper scroll navigation button visibility logic. The left navigation button now disappears when at the leftmost position, and the right navigation button disappears when at the rightmost position. This provides intuitive visual feedback about scroll boundaries and prevents unnecessary interaction with disabled navigation controls.
 
 ### Product Mockups Button Glitch Fix
-Fixed an unintentional layout glitch where clicking the "Product mockups" button caused the entire page to shift horizontally from left to right. This behavior was unique to this button and not present in other category buttons. The implementation now ensures consistent behavior across all category selections without any unwanted page movement. This implementation does not include the background animations, which is likely the reason of the layout shift issue's fix.
+Fixed an unintentional layout glitch where clicking the "Product mockups" button caused the entire page to shift horizontally from left to right. This behavior was unique to this button and not present in other category buttons. The implementation now ensures consistent behavior across all category selections without any unwanted page movement.
 
 ### Consistent Prompt Box Height
 Implemented minimum height constraint for the prompt box to ensure consistent sizing across all categories. Whether displaying a textarea input or info message badge, the prompt box now maintains a fixed height of 168px, preventing visual jumps when switching between different category types.
 
-![Carousel Navigation](./public/images/improvements/carousel-navigation.png)
+![Carousel Navigation](./frontend/public/images/improvements/carousel-navigation.png)
+
+---
+
+## Troubleshooting
+
+```bash
+# View container logs
+docker logs sourceful-backend -f
+docker logs sourceful-frontend -f
+
+# Rebuild containers
+docker-compose build --no-cache
+docker-compose up -d
+
+# Check container status
+docker ps
+```
