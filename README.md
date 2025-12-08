@@ -42,6 +42,20 @@ docker-compose down
 
 **Coverage**: 28 tests, 93% overall
 
+**Test Coverage by Component:**
+- **Routes (95%)** - API endpoints (create job, get job, list jobs)
+- **Services (96%)** - Business logic (job creation, status updates)
+- **Repositories (100%)** - Database operations (CRUD, queries)
+- **Workers (82%)** - Async job processing (concurrent job execution, image generation)
+- **Integration (100%)** - End-to-end workflows (job creation → parallel processing → completion)
+
+**Key Aspects Tested:**
+- ✅ Concurrent job processing with `asyncio.gather()`
+- ✅ Async worker without threading conflicts
+- ✅ Database session management with connection pooling
+- ✅ Error handling and rollback mechanisms
+- ✅ Job status transitions (pending → processing → completed/failed)
+
 ```bash
 # Run all tests
 docker exec sourceful-backend pytest
