@@ -3,7 +3,7 @@
 
 from abc import ABC, abstractmethod
 from typing import List
-import time
+import asyncio
 
 
 class ImageProvider(ABC):
@@ -71,8 +71,8 @@ class MockImageProvider(ImageProvider):
         Returns:
             List of placeholder image URLs
         """
-        # Simulate API call delay
-        time.sleep(self.delay_seconds)
+        # Simulate API call delay (use asyncio.sleep for proper async behavior)
+        await asyncio.sleep(self.delay_seconds * num_images)
         
         # Generate placeholder URLs
         # In production, these would be actual URLs from the image generation service
@@ -84,7 +84,7 @@ class MockImageProvider(ImageProvider):
 
 
 # Factory function to get the appropriate provider
-def get_image_provider(delay_seconds: float = 2.0) -> ImageProvider:
+def get_image_provider(delay_seconds: float = 20.0) -> ImageProvider:
     """
     Factory function to instantiate the image provider
     
@@ -94,6 +94,6 @@ def get_image_provider(delay_seconds: float = 2.0) -> ImageProvider:
     - For Stable Diffusion: return StableDiffusionProvider(api_key=os.getenv("SD_API_KEY"))
     
     Args:
-        delay_seconds: Delay for mock provider
+        delay_seconds: Delay per image for mock provider (default 5s simulates realistic API calls)
     """
     return MockImageProvider(delay_seconds=delay_seconds)

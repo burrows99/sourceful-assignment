@@ -40,8 +40,8 @@ class Settings(BaseSettings):
     # Worker Settings
     WORKER_POLL_INTERVAL: float = 1.0
     
-    # Provider Settings
-    IMAGE_PROVIDER_DELAY: float = 2.0
+    # Provider Settings (5 seconds simulates realistic image generation API)
+    IMAGE_PROVIDER_DELAY: float = 5.0
     
     # Job Settings
     MIN_IMAGES_PER_JOB: int = 1

@@ -54,6 +54,8 @@ docker-compose down
 | **API Docs** | http://localhost:8000/docs | - |
 | **pgAdmin** | http://localhost:5050 | admin@admin.com:admin |
 
+**Note**: Mock image generation takes ~5 seconds per image to simulate realistic API behavior. Generating 10 images will take approximately 50 seconds.
+
 ---
 
 ## Database Visualization (pgAdmin)
