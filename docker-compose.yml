@@ -8,12 +8,15 @@ services:
     container_name: sourceful-backend
     ports:
       - "8000:8000"
+      - "5678:5678"  # Debug port
     volumes:
       - ./backend:/app
       - /app/venv
     environment:
       - PYTHONUNBUFFERED=1
       - WATCHFILES_FORCE_POLLING=true
+      - ENABLE_DEBUG=true
+      - DEBUG_PORT=5678
     networks:
       - sourceful-network
     restart: unless-stopped
