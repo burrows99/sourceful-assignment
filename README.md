@@ -17,6 +17,34 @@ docker-compose logs -f
 docker-compose down
 ```
 
+### Startup Times & Expected Logs
+
+**PostgreSQL** (~5 seconds):
+```
+✅ Ready: "database system is ready to accept connections"
+```
+
+**Backend** (~10-15 seconds):
+```
+✅ Ready: "✅ Database initialized"
+✅ Ready: "✅ Database migrations applied"  
+✅ Ready: "✅ Async image worker started"
+✅ Ready: "Uvicorn running on http://0.0.0.0:8000"
+```
+⚠️ Note: You may see a migration warning about duplicate tables - this is normal if the database already exists.
+
+**Frontend** (~20-30 seconds):
+```
+✅ Ready: "✓ Ready in 4.5s"
+✅ Ready: "Local: http://localhost:3000"
+```
+
+**pgAdmin** (~30-40 seconds):
+```
+✅ Ready: "Booting worker with pid"
+✅ Ready: "Added 0 Server Group(s) and 1 Server(s)"
+```
+
 ### Access Services
 
 | Service | URL | Credentials |
