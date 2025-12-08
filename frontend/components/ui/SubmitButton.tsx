@@ -35,6 +35,7 @@ export function SubmitButton({
 }: SubmitButtonProps) {
   const { buttonText, iconSide, isDisabled, showCreditBadge, credits, featureAvailable, buttonTextOverride } = useButtonState(promptSubmitButton);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [buttonElement, setButtonElement] = useState<HTMLButtonElement | null>(null);
   
   const shouldShowTooltip = featureAvailable === false && buttonTextOverride;
   
@@ -45,6 +46,7 @@ export function SubmitButton({
       onMouseLeave={() => setShowTooltip(false)}
     >
       <button
+        ref={(el) => setButtonElement(el)}
         type="submit"
         disabled={isDisabled}
         className={cn(
@@ -136,7 +138,8 @@ export function SubmitButton({
       <ButtonTooltip
         text={buttonTextOverride || ''}
         subtext={promptSubmitButton?.requiredCredits ? `${promptSubmitButton.requiredCredits} credits required` : undefined}
-        show={shouldShowTooltip && showTooltip}
+        show={!!(shouldShowTooltip && showTooltip)}
+        targetElement={buttonElement}
       />
     </div>
   );

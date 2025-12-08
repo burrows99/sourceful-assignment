@@ -92,11 +92,13 @@ export function CategoryCarousel({
           {categories.map((category) => (
             <IconButton
               key={category.id}
-              ref={(el) => buttonRefs.current[category.id] = el}
+              ref={(el) => { buttonRefs.current[category.id] = el; }}
               icon={<Icon name={category.icon} />}
               text={category.name}
               isSelected={selectedCategory === category.id}
               statusBadge={category.statusBadge}
+              tooltipImage={category.tooltipImage}
+              tooltipDescription={category.tooltipDescription}
               onClick={() => handleCategoryClick(category.id)}
               aria-label={`Select ${category.name}`}
             />

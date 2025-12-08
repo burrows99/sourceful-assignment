@@ -23,6 +23,8 @@ export interface Category {
     text: string;
     color: 'gradient' | 'orange';
   };
+  tooltipImage?: string;
+  tooltipDescription?: string;
 }
 
 export const categories: readonly Category[] = [
@@ -43,6 +45,8 @@ export const categories: readonly Category[] = [
       },
     },
     placeholder: 'Describe your ideal packaging vision...',
+    tooltipImage: 'https://www.sourceful.com/_next/image?url=%2Fimages%2Fprompt-box%2Fprompt-packaging-design.webp&w=640&q=75',
+    tooltipDescription: 'Design packaging that looks ready for the shelf.',
   },
   { 
     id: 'logo-design', 
@@ -62,6 +66,8 @@ export const categories: readonly Category[] = [
     },
     placeholder: 'Describe your brand, target audience and any details about the logo you want...',
     statusBadge: { text: 'New!', color: 'gradient' },
+    tooltipImage: 'https://www.sourceful.com/_next/image?url=%2Fimages%2Fprompt-box%2Fprompt-packaging-design.webp&w=640&q=75',
+    tooltipDescription: 'Create unique logos for your brand identity.',
   },
   { 
     id: 'create-image', 
@@ -85,6 +91,8 @@ export const categories: readonly Category[] = [
     },
     placeholder: 'Describe the image you want to create...',
     statusBadge: { text: 'New!', color: 'gradient' },
+    tooltipImage: 'https://www.sourceful.com/_next/image?url=%2Fimages%2Fprompt-box%2Fprompt-packaging-design.webp&w=640&q=75',
+    tooltipDescription: 'Generate custom images with AI for any purpose.',
   },
   { 
     id: 'edit-image', 
@@ -94,6 +102,8 @@ export const categories: readonly Category[] = [
     unauthenticated: {},
     placeholder: 'Describe your ideal card or poster vision...',
     showDialog: true,
+    tooltipImage: 'https://www.sourceful.com/_next/image?url=%2Fimages%2Fprompt-box%2Fprompt-packaging-design.webp&w=640&q=75',
+    tooltipDescription: 'Edit and enhance your existing images with AI.',
   },
   { 
     id: 'ai-photoshoot', 
@@ -113,6 +123,8 @@ export const categories: readonly Category[] = [
     },
     infoMessage: 'Click start photoshoot brief to add your specific shot details.',
     statusBadge: { text: 'New!', color: 'gradient' },
+    tooltipImage: 'https://www.sourceful.com/_next/image?url=%2Fimages%2Fprompt-box%2Fprompt-packaging-design.webp&w=640&q=75',
+    tooltipDescription: 'Create professional product photography with AI.',
   },
   { 
     id: 'packaging-range', 
@@ -132,6 +144,8 @@ export const categories: readonly Category[] = [
     },
     infoMessage: 'Click start packaging range to add your reference design and choose your packaging types.',
     statusBadge: { text: 'New!', color: 'gradient' },
+    tooltipImage: 'https://www.sourceful.com/_next/image?url=%2Fimages%2Fprompt-box%2Fprompt-packaging-design.webp&w=640&q=75',
+    tooltipDescription: 'Design consistent packaging across multiple products.',
   },
   { 
     id: 'variant-range', 
@@ -151,6 +165,8 @@ export const categories: readonly Category[] = [
     },
     infoMessage: 'Click start variant range to add your reference design and describe your variants.',
     statusBadge: { text: 'New!', color: 'gradient' },
+    tooltipImage: 'https://www.sourceful.com/_next/image?url=%2Fimages%2Fprompt-box%2Fprompt-packaging-design.webp&w=640&q=75',
+    tooltipDescription: 'Create multiple design variants from one concept.',
   },
   { 
     id: 'social-ads', 
@@ -160,6 +176,8 @@ export const categories: readonly Category[] = [
     unauthenticated: {},
     infoMessage: 'This tool is coming soon! Choose another tool to continue.',
     statusBadge: { text: 'Coming soon', color: 'orange' },
+    tooltipImage: 'https://www.sourceful.com/_next/image?url=%2Fimages%2Fprompt-box%2Fprompt-packaging-design.webp&w=640&q=75',
+    tooltipDescription: 'Create engaging ads for social media platforms.',
   },
   { 
     id: 'brand-moodboard', 
@@ -179,6 +197,8 @@ export const categories: readonly Category[] = [
     },
     infoMessage: 'Click start moodboard brief to add your brand and style details.',
     statusBadge: { text: 'New!', color: 'gradient' },
+    tooltipImage: 'https://www.sourceful.com/_next/image?url=%2Fimages%2Fprompt-box%2Fprompt-packaging-design.webp&w=640&q=75',
+    tooltipDescription: 'Build visual inspiration boards for your brand.',
   },
   { 
     id: 'product-mockups', 
@@ -198,6 +218,8 @@ export const categories: readonly Category[] = [
     },
     infoMessage: 'Click start your new product mockup, supply your artwork and choose your desired product type.',
     statusBadge: { text: 'New!', color: 'gradient' },
+    tooltipImage: 'https://www.sourceful.com/_next/image?url=%2Fimages%2Fprompt-box%2Fprompt-packaging-design.webp&w=640&q=75',
+    tooltipDescription: 'Showcase designs on realistic product mockups.',
   },
   { 
     id: 'card-and-posters', 
@@ -219,5 +241,7 @@ export const categories: readonly Category[] = [
     },
     placeholder: 'Describe your card or poster design...',
     statusBadge: { text: 'New!', color: 'gradient' },
+    tooltipImage: 'https://www.sourceful.com/_next/image?url=%2Fimages%2Fprompt-box%2Fprompt-packaging-design.webp&w=640&q=75',
+    tooltipDescription: 'Design beautiful cards and posters for any occasion.',
   },
 ] as const;

@@ -7,8 +7,9 @@
 
 'use client';
 
-import { type ReactNode, type ButtonHTMLAttributes, forwardRef } from 'react';
+import { type ReactNode, type ButtonHTMLAttributes, forwardRef, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { ButtonTooltip } from './ButtonTooltip';
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   /** Icon element to display */
@@ -22,6 +23,10 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     text: string;
     color: 'gradient' | 'orange';
   };
+  /** Optional tooltip image */
+  tooltipImage?: string;
+  /** Optional tooltip description */
+  tooltipDescription?: string;
 }
 
 const baseStyles = `
@@ -55,26 +60,41 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
     text,
     isSelected = false,
     statusBadge,
+    tooltipImage,
+    tooltipDescription,
     className,
     ...props
   }, ref) => {
+    const [showTooltip, setShowTooltip] = useState(false);
+    const [buttonElement, setButtonElement] = useState<HTMLButtonElement | null>(null);
+
     const badgeColorClass = statusBadge?.color === 'orange'
       ? 'text-orange-500'
       : 'text-transparent bg-clip-text bg-gradient-to-r from-violet-500 via-blue-500 to-green-500';
 
     return (
-      <button
-        ref={ref}
-        type="button"
-        data-state={isSelected ? 'selected' : 'default'}
-        className={cn(
-          baseStyles,
-          iconStyles,
-          isSelected ? selectedStyles : defaultStyles,
-          className
-        )}
-        {...props}
-      >
+      <>
+        <button
+          ref={(el) => {
+            setButtonElement(el);
+            if (typeof ref === 'function') {
+              ref(el);
+            } else if (ref) {
+              ref.current = el;
+            }
+          }}
+          type="button"
+          data-state={isSelected ? 'selected' : 'default'}
+          className={cn(
+            baseStyles,
+            iconStyles,
+            isSelected ? selectedStyles : defaultStyles,
+            className
+          )}
+          onMouseEnter={() => setShowTooltip(true)}
+          onMouseLeave={() => setShowTooltip(false)}
+          {...props}
+        >
         <div className="w-6 h-6 flex items-center justify-center">
           {icon}
         </div>
@@ -94,7 +114,16 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
             {statusBadge.text}
           </span>
         )}
-      </button>
+        </button>
+        
+        <ButtonTooltip
+          text={text}
+          subtext={tooltipDescription || 'Click to select this tool'}
+          image={tooltipImage}
+          show={showTooltip}
+          targetElement={buttonElement}
+        />
+      </>
     );
   }
 );
