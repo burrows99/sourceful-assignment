@@ -55,8 +55,11 @@ docker-compose down
 **Services:**
 - Backend API: http://localhost:8000
 - API Docs: http://localhost:8000/docs
-- PostgreSQL: localhost:5432
-- pgAdmin: http://localhost:5050 (admin@sourceful.com / admin123)
+- PostgreSQL: localhost:5432 (postgres:postgres)
+- pgAdmin: http://localhost:5050
+  - Login: `admin@admin.com` / `admin`
+  - Server auto-configured: "Sourceful PostgreSQL"
+  - DB Password when prompted: `postgres`
 
 ### Local Development
 
@@ -64,8 +67,8 @@ docker-compose down
 # Install dependencies
 pip install -r requirements.txt
 
-# Set database URL
-export DATABASE_URL="postgresql+asyncpg://sourceful:sourceful123@localhost:5432/sourceful_db"
+# Set database URL (uses default postgres credentials)
+export DATABASE_URL="postgresql+asyncpg://postgres:postgres@localhost:5432/postgres"
 
 # Run migrations
 alembic upgrade head
@@ -73,6 +76,16 @@ alembic upgrade head
 # Start server
 fastapi dev main.py
 ```
+
+### Accessing pgAdmin
+
+1. Navigate to http://localhost:5050
+2. Login with: `admin@admin.com` / `admin`
+3. In left sidebar, expand **"Servers"**
+4. Click **"Sourceful PostgreSQL"** 
+5. When prompted for password, enter: `postgres`
+6. Check "Save Password" to avoid future prompts
+7. Browse to **Databases → postgres → Schemas → public → Tables → jobs**
 
 ## 🔌 API Endpoints
 
@@ -137,7 +150,7 @@ alembic downgrade -1
 Environment variables (create `.env` file):
 
 ```env
-DATABASE_URL=postgresql+asyncpg://user:pass@postgres:5432/db
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/postgres
 WORKER_POLL_INTERVAL=1.0
 IMAGE_PROVIDER_DELAY=2.0
 MAX_IMAGES_PER_JOB=10

@@ -5,16 +5,14 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=sourceful
-      - POSTGRES_PASSWORD=sourceful123
-      - POSTGRES_DB=sourceful_db
+      - POSTGRES_PASSWORD=postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - sourceful-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U sourceful"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -25,16 +23,18 @@ services:
     ports:
       - "5050:80"
     environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@sourceful.com
-      - PGADMIN_DEFAULT_PASSWORD=admin123
-      - PGADMIN_CONFIG_SERVER_MODE=False
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_SERVER_JSON_FILE=/pgadmin4/servers.json
     volumes:
       - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
     networks:
       - sourceful-network
     restart: unless-stopped
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   backend:
     build:
@@ -48,11 +48,7 @@ services:
       - ./backend:/app
       - /app/venv
     environment:
-      - PYTHONUNBUFFERED=1
-      - WATCHFILES_FORCE_POLLING=true
-      - ENABLE_DEBUG=true
-      - DEBUG_PORT=5678
-      - DATABASE_URL=postgresql+asyncpg://sourceful:sourceful123@postgres:5432/sourceful_db
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/postgres
     networks:
       - sourceful-network
     restart: unless-stopped
