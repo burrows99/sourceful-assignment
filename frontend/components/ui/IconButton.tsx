@@ -49,7 +49,7 @@ const selectedStyles = `
 `;
 
 const defaultStyles = `
-  bg-[rgb(248,248,248)]
+  bg-transparent
   hover:bg-neutral-100
   active:bg-neutral-100
 `;
