@@ -33,7 +33,7 @@ docker-compose down
 1. Open http://localhost:5050
 2. Login: `admin@admin.com` / `admin`
 3. Expand **"Servers"** → Click **"Sourceful PostgreSQL"**
-4. Enter password: `postgres` (check "Save Password")
+4. Enter server password: `postgres` (check "Save Password")
 5. Navigate to: **Databases → postgres → Schemas → public → Tables → jobs**
 
 ---
