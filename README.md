@@ -7,7 +7,7 @@ Full-stack image generation application with FastAPI backend, Next.js frontend, 
 ## Quick Start
 
 ```bash
-# Start all services
+# Start all services (migrations run automatically on backend start)
 docker-compose up -d
 
 # View logs

@@ -22,12 +22,30 @@ if settings.ENABLE_DEBUG:
 async def lifespan(app: FastAPI):
     """
     Lifespan event handler
-    - Startup: Initialize database, worker, etc.
+    - Startup: Initialize database, run migrations, start worker
     - Shutdown: Cleanup resources
     """
     # Startup
     await sessionmanager.init_db()
     print("✅ Database initialized")
+    
+    # Run migrations automatically
+    try:
+        import subprocess
+        result = subprocess.run(
+            ["alembic", "upgrade", "head"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        print("✅ Database migrations applied")
+        if result.stdout:
+            print(result.stdout)
+    except subprocess.CalledProcessError as e:
+        print(f"⚠️  Migration warning: {e.stderr}")
+    except Exception as e:
+        print(f"⚠️  Could not run migrations: {e}")
+    
     worker.start()
     yield
     # Shutdown
