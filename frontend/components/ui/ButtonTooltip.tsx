@@ -27,10 +27,21 @@ interface ButtonTooltipProps {
 
 export function ButtonTooltip({ text, subtext, image, show, targetElement }: ButtonTooltipProps) {
   const [mounted, setMounted] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (show && mounted) {
+      // Small delay to trigger animation
+      const timer = setTimeout(() => setIsVisible(true), 10);
+      return () => clearTimeout(timer);
+    } else {
+      setIsVisible(false);
+    }
+  }, [show, mounted]);
 
   if (!show || !mounted || !targetElement) return null;
 
@@ -42,6 +53,8 @@ export function ButtonTooltip({ text, subtext, image, show, targetElement }: But
     <div 
       className={cn(
         "fixed text-white shadow-2xl z-60 pointer-events-none",
+        "transition-opacity duration-200 ease-out",
+        isVisible ? "opacity-100" : "opacity-0",
         image 
           ? "bg-black rounded-4xl overflow-hidden p-3" 
           : "bg-gray-900 px-4 py-2.5 rounded-lg whitespace-nowrap"
