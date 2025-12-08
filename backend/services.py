@@ -2,19 +2,20 @@
 from datetime import datetime, timezone
 import uuid
 from typing import Optional, List
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import GenerationResponse, JobDetailResponse, Job, JobStatus
-from database import db
+from repositories.job_repository import JobRepository
 
 
 class GenerationService:
     """
     Service layer for image generation business logic
-    Separates business logic from API routes
+    Uses repository pattern for data access
     """
     
-    def __init__(self):
-        self.db = db
+    def __init__(self, session: AsyncSession):
+        self.repository = JobRepository(session)
     
     async def create_job(self, num_images: int) -> GenerationResponse:
         """
@@ -29,7 +30,7 @@ class GenerationService:
         # Generate unique job ID
         job_id = str(uuid.uuid4())
         
-        # Create job in database
+        # Create job entity
         now = datetime.now(timezone.utc).isoformat()
         job = Job(
             id=job_id,
@@ -39,7 +40,8 @@ class GenerationService:
             updatedAt=now
         )
         
-        self.db.create_job(job)
+        # Persist to database
+        await self.repository.create(job)
         
         return GenerationResponse(
             jobId=job_id,
@@ -56,7 +58,7 @@ class GenerationService:
         Returns:
             JobDetailResponse if found, None otherwise
         """
-        job = self.db.get_job(job_id)
+        job = await self.repository.get_by_id(job_id)
         
         if not job:
             return None
@@ -79,7 +81,7 @@ class GenerationService:
         Returns:
             List of JobDetailResponse objects
         """
-        jobs = self.db.get_all_jobs()
+        jobs = await self.repository.get_all()
         
         return [
             JobDetailResponse(

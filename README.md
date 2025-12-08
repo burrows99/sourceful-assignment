@@ -32,6 +32,34 @@ docker-compose logs -f
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
+- **PostgreSQL**: localhost:5432 (user: sourceful, password: sourceful123)
+- **pgAdmin**: http://localhost:5050 (email: admin@sourceful.com, password: admin123)
+
+### pgAdmin Setup
+
+1. Open http://localhost:5050
+2. Login with email: `admin@sourceful.com` and password: `admin123`
+3. Add server:
+   - Name: Sourceful DB
+   - Host: postgres
+   - Port: 5432
+   - Database: sourceful_db
+   - Username: sourceful
+   - Password: sourceful123
+
+### Database Migrations
+
+The database is automatically initialized on startup. To manually run migrations:
+
+```bash
+docker-compose exec backend bash -c "cd /app && alembic upgrade head"
+```
+
+To create a new migration:
+
+```bash
+docker-compose exec backend bash -c "cd /app && alembic revision -m 'your migration message'"
+```
 
 ### Development Mode
 For development with hot reload, you can still run the services locally:

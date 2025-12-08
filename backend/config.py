@@ -47,6 +47,9 @@ class Settings(BaseSettings):
     MIN_IMAGES_PER_JOB: int = 1
     MAX_IMAGES_PER_JOB: int = 10
     
+    # Database Settings
+    DATABASE_URL: str = "postgresql+asyncpg://sourceful:sourceful123@postgres:5432/sourceful_db"
+    
     # Debug Settings
     ENABLE_DEBUG: bool = True
     DEBUG_PORT: int = 5678

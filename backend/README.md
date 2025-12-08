@@ -1,181 +1,169 @@
-# FastAPI Backend
+# Image Generation API - Backend
 
-A FastAPI-based image generation API with asynchronous job processing, following proper design patterns and separation of concerns.
+Production-grade FastAPI application with async job processing, PostgreSQL database, and containerized deployment.
 
-## Architecture & Design Patterns
+## 🏗️ Architecture
 
-### 📁 Project Structure
+**Layered Architecture** with proper separation of concerns:
+- `routes.py` - API endpoints (presentation layer)
+- `services.py` - Business logic (service layer)  
+- `repositories/` - Data access (persistence layer)
+- `workers/` - Background job processing
+
+**Key Production Patterns:**
+- Repository Pattern for data access
+- Dependency Injection via FastAPI Depends
+- Session Management with connection pooling
+- Async Worker in main event loop (no threading)
+
+## 📁 Project Structure
 
 ```
 backend/
-├── main.py              # Application factory & setup
-├── config.py            # Configuration management (Settings pattern)
-├── routes.py            # API route handlers (Controller layer)
-├── services.py          # Business logic (Service layer)
-├── models.py            # Pydantic models (DTO pattern)
-├── database.py          # Data access layer (Repository pattern)
-├── providers.py         # Provider interface (Strategy pattern)
-├── worker.py            # Background job processor
-└── dependencies.py      # Dependency injection
+├── main.py                     # Application factory & lifespan
+├── config.py                   # Settings with environment variables
+├── models.py                   # Pydantic domain models
+├── db_models.py                # SQLAlchemy ORM models
+├── routes.py                   # API endpoints
+├── services.py                 # Business logic layer
+├── providers.py                # Image generation provider interface
+├── core/
+│   └── database.py             # Session manager & DI
+├── repositories/
+│   └── job_repository.py       # Database operations
+└── workers/
+    └── async_worker.py         # Async job processor
 ```
 
-### 🏗️ Design Patterns Used
+See `PRODUCTION_ARCHITECTURE.md` for detailed architecture documentation.
 
-1. **Application Factory Pattern** (`main.py`)
-   - `create_application()` function for testable app creation
-   - Centralized middleware and router registration
+## 🚀 Quick Start
 
-2. **Layered Architecture**
-   - **Routes Layer**: HTTP request/response handling
-   - **Service Layer**: Business logic and orchestration
-   - **Data Layer**: Database operations
+### Docker (Recommended)
 
-3. **Repository Pattern** (`database.py`)
-   - Abstracted data access
-   - Easy to swap implementations (in-memory → SQL)
-
-4. **Strategy Pattern** (`providers.py`)
-   - `ImageProvider` abstract interface
-   - Pluggable image generation backends
-
-5. **Settings Pattern** (`config.py`)
-   - Environment-based configuration
-   - Pydantic settings with validation
-   - `.env` file support
-
-6. **Dependency Injection** (`dependencies.py`)
-   - FastAPI's `Depends()` ready
-   - Testable and mockable dependencies
-
-### Features
-
-- **Async Job Processing**: Image generation jobs are processed in the background
-- **Provider Pattern**: Easily swap between different image generation providers
-- **Job Queue System**: Track job status and retrieve results
-- **Configuration Management**: Environment-based settings
-- **Proper Separation of Concerns**: Routes, services, and data access are cleanly separated
-- **In-Memory Database**: Simple storage with clear migration path to SQL databases
-
-## Setup
-
-1. Create a virtual environment:
 ```bash
-python3 -m venv venv
-source venv/bin/activate  # On macOS/Linux
+# Start all services
+docker-compose up -d
+
+# View logs
+docker logs sourceful-backend -f
+
+# Stop services
+docker-compose down
 ```
 
-2. Install dependencies:
+**Services:**
+- Backend API: http://localhost:8000
+- API Docs: http://localhost:8000/docs
+- PostgreSQL: localhost:5432
+- pgAdmin: http://localhost:5050 (admin@sourceful.com / admin123)
+
+### Local Development
+
 ```bash
+# Install dependencies
 pip install -r requirements.txt
-```
 
-3. Configure environment (optional):
-```bash
-cp .env.example .env
-# Edit .env with your settings
-```
+# Set database URL
+export DATABASE_URL="postgresql+asyncpg://sourceful:sourceful123@localhost:5432/sourceful_db"
 
-## Run
+# Run migrations
+alembic upgrade head
 
-Start the development server:
-```bash
+# Start server
 fastapi dev main.py
 ```
 
-The server will run at `http://127.0.0.1:8000`
+## 🔌 API Endpoints
 
-## Configuration
+### Create Job
+```bash
+POST /generations
+Content-Type: application/json
 
-Edit `.env` file or set environment variables:
+{
+  "numImages": 3
+}
+
+# Response (202 Accepted):
+{
+  "jobId": "uuid",
+  "status": "pending"
+}
+```
+
+### Get Job Status
+```bash
+GET /generations/{jobId}
+
+# Response (200 OK):
+{
+  "jobId": "uuid",
+  "status": "completed",
+  "numImages": 3,
+  "animal": "bear",
+  "imageUrls": ["url1", "url2", "url3"],
+  "createdAt": "2025-12-08T02:14:39+00:00",
+  "updatedAt": "2025-12-08T02:14:42+00:00"
+}
+```
+
+### List All Jobs
+```bash
+GET /generations
+
+# Response: Array of job objects
+```
+
+## 💾 Database
+
+- **PostgreSQL** with asyncpg driver
+- **SQLAlchemy** async ORM
+- **Alembic** migrations
+
+```bash
+# Create migration
+alembic revision -m "description"
+
+# Apply migrations
+alembic upgrade head
+
+# Rollback
+alembic downgrade -1
+```
+
+## 🔧 Configuration
+
+Environment variables (create `.env` file):
 
 ```env
-APP_NAME="Image Generation API"
-VERSION="1.0.0"
-DEBUG=true
+DATABASE_URL=postgresql+asyncpg://user:pass@postgres:5432/db
 WORKER_POLL_INTERVAL=1.0
 IMAGE_PROVIDER_DELAY=2.0
 MAX_IMAGES_PER_JOB=10
 ```
 
-## API Documentation
+## 🧪 Testing
 
-- Interactive docs (Swagger UI): `http://127.0.0.1:8000/docs`
-- Alternative docs (ReDoc): `http://127.0.0.1:8000/redoc`
+```bash
+# Create job
+curl -X POST http://localhost:8000/generations \
+  -H "Content-Type: application/json" \
+  -d '{"numImages": 3}'
 
-## Endpoints
+# Check status (wait ~3 seconds)
+curl http://localhost:8000/generations/{jobId}
 
-### POST /generations
-Create a new image generation job.
-
-**Request:**
-```json
-{
-  "numImages": 3
-}
+# List all jobs
+curl http://localhost:8000/generations
 ```
 
-**Response (202 Accepted):**
-```json
-{
-  "jobId": "550e8400-e29b-41d4-a716-446655440000",
-  "status": "pending"
-}
-```
+## 📚 Documentation
 
-### GET /generations/{jobId}
-Get the status and results of a specific job.
+- **Architecture Details**: See `PRODUCTION_ARCHITECTURE.md`
+- **API Docs**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
 
-**Response:**
-```json
-{
-  "jobId": "550e8400-e29b-41d4-a716-446655440000",
-  "status": "completed",
-  "numImages": 3,
-  "animal": "cat",
-  "imageUrls": [
-    "https://example.com/image1.png",
-    "https://example.com/image2.png",
-    "https://example.com/image3.png"
-  ],
-  "createdAt": "2025-12-08T01:23:45.678Z",
-  "updatedAt": "2025-12-08T01:23:48.123Z"
-}
-```
+## 🐛 Debugging
 
-### GET /generations
-List all generation jobs.
-
-**Response:**
-```json
-{
-  "jobs": [
-    {
-      "jobId": "...",
-      "status": "completed",
-      "numImages": 3,
-      "animal": "cat",
-      "imageUrls": ["..."],
-      "createdAt": "...",
-      "updatedAt": "..."
-    }
-  ]
-}
-```
-
-## Job Statuses
-
-- `pending`: Job created, waiting to be processed
-- `processing`: Worker is generating images
-- `completed`: Images generated successfully
-- `failed`: Error occurred during generation
-
-## Migration to Production Database
-
-The current in-memory database can be easily replaced with SQLite or Postgres:
-
-1. Install SQLAlchemy: `pip install sqlalchemy[asyncio]`
-2. Create database models using SQLAlchemy ORM
-3. Replace the `JobDatabase` class methods with SQL queries
-4. Update the connection in `database.py`
-
-Comments in `database.py` provide guidance on this migration.
+Remote debugging enabled on port 5678. Attach VS Code debugger using the provided launch configuration.

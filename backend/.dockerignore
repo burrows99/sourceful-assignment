@@ -8,6 +8,6 @@ __pycache__
 *.log
 .git
 .gitignore
-README.md
-Dockerfile
+*.md
 .dockerignore
+alembic/

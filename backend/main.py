@@ -4,7 +4,8 @@ from contextlib import asynccontextmanager
 
 from config import settings
 from routes import router as generations_router
-from worker import worker
+from workers.async_worker import worker
+from core.database import sessionmanager
 
 
 # Enable remote debugging if configured
@@ -21,14 +22,18 @@ if settings.ENABLE_DEBUG:
 async def lifespan(app: FastAPI):
     """
     Lifespan event handler
-    - Startup: Initialize worker, connections, etc.
+    - Startup: Initialize database, worker, etc.
     - Shutdown: Cleanup resources
     """
     # Startup
+    await sessionmanager.init_db()
+    print("✅ Database initialized")
     worker.start()
     yield
     # Shutdown
-    worker.stop()
+    await worker.stop()
+    await sessionmanager.close()
+    print("✅ Shutdown complete")
 
 
 def create_application() -> FastAPI:

@@ -1,6 +1,41 @@
-version: '3.8'
-
 services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sourceful-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=sourceful
+      - POSTGRES_PASSWORD=sourceful123
+      - POSTGRES_DB=sourceful_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sourceful-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sourceful"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: sourceful-pgadmin
+    ports:
+      - "5050:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@sourceful.com
+      - PGADMIN_DEFAULT_PASSWORD=admin123
+      - PGADMIN_CONFIG_SERVER_MODE=False
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - sourceful-network
+    restart: unless-stopped
+    depends_on:
+      - postgres
+
   backend:
     build:
       context: ./backend
@@ -17,9 +52,13 @@ services:
       - WATCHFILES_FORCE_POLLING=true
       - ENABLE_DEBUG=true
       - DEBUG_PORT=5678
+      - DATABASE_URL=postgresql+asyncpg://sourceful:sourceful123@postgres:5432/sourceful_db
     networks:
       - sourceful-network
     restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   frontend:
     build:
@@ -45,3 +84,7 @@ services:
 networks:
   sourceful-network:
     driver: bridge
+
+volumes:
+  postgres_data:
+  pgadmin_data:
