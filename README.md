@@ -1,5 +1,43 @@
 # sourceful-assignment
 
+## Docker Setup
+
+### Prerequisites
+- Docker installed on your system
+- Docker Compose installed
+
+### Running with Docker Compose
+
+1. **Build and start all services:**
+```bash
+docker-compose up --build
+```
+
+2. **Run in detached mode (background):**
+```bash
+docker-compose up -d
+```
+
+3. **Stop all services:**
+```bash
+docker-compose down
+```
+
+4. **View logs:**
+```bash
+docker-compose logs -f
+```
+
+### Access the Application
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/docs
+
+### Development Mode
+For development with hot reload, you can still run the services locally:
+- Frontend: `cd frontend && npm run dev`
+- Backend: `cd backend && venv/bin/python -m fastapi dev main.py`
+
 ## Improvements Implemented
 
 ### Mobile Dialog - Selected State Indicator
