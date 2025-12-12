@@ -118,9 +118,9 @@ class TestVisionProviders:
     @pytest.mark.asyncio
     async def test_mock_provider_cat(self):
         """Test mock provider with cat image"""
-        from providers import MockVisionProvider
+        from providers import MockProvider
         
-        provider = MockVisionProvider()
+        provider = MockProvider()
         result = await provider.classify_image("https://example.com/cat.jpg")
         
         assert result["animals"] == ["cat"]
@@ -129,9 +129,9 @@ class TestVisionProviders:
     @pytest.mark.asyncio
     async def test_mock_provider_dog(self):
         """Test mock provider with dog image"""
-        from providers import MockVisionProvider
+        from providers import MockProvider
         
-        provider = MockVisionProvider()
+        provider = MockProvider()
         result = await provider.classify_image("https://example.com/dog-photo.jpg")
         
         assert result["animals"] == ["dog"]
@@ -139,9 +139,9 @@ class TestVisionProviders:
     @pytest.mark.asyncio
     async def test_mock_provider_bird(self):
         """Test mock provider with bird image"""
-        from providers import MockVisionProvider
+        from providers import MockProvider
         
-        provider = MockVisionProvider()
+        provider = MockProvider()
         result = await provider.classify_image("https://example.com/bird-picture.jpg")
         
         assert result["animals"] == ["bird"]
@@ -149,50 +149,33 @@ class TestVisionProviders:
     @pytest.mark.asyncio
     async def test_mock_provider_no_animals(self):
         """Test mock provider with no animal keywords"""
-        from providers import MockVisionProvider
+        from providers import MockProvider
         
-        provider = MockVisionProvider()
+        provider = MockProvider()
         result = await provider.classify_image("https://example.com/landscape.jpg")
         
         assert result["animals"] == []
         assert "No animals detected" in result["error"]
     
     @pytest.mark.asyncio
-    async def test_base_provider_parse_animals_none(self):
-        """Test base provider parsing when no animals"""
-        from providers import BaseVisionProvider
+    async def test_mock_provider_supports_both_capabilities(self):
+        """Test that mock provider supports both image generation and classification"""
+        from providers import MockProvider
         
-        class TestProvider(BaseVisionProvider):
-            def __init__(self):
-                super().__init__("test-key", "test-model", "http://test.com")
+        provider = MockProvider(delay_seconds=0.1)
         
-        provider = TestProvider()
-        result = provider._parse_animals("NONE")
+        # Test image generation
+        images = await provider.generate_images("a cute cat", 2)
+        assert len(images) == 2
         
-        assert result["animals"] == []
-        assert "No animals detected" in result["error"]
-    
-    @pytest.mark.asyncio
-    async def test_base_provider_parse_animals_list(self):
-        """Test base provider parsing animal list"""
-        from providers import BaseVisionProvider
-        
-        class TestProvider(BaseVisionProvider):
-            def __init__(self):
-                super().__init__("test-key", "test-model", "http://test.com")
-        
-        provider = TestProvider()
-        result = provider._parse_animals("cat, dog, bird")
-        
-        assert len(result["animals"]) == 3
-        assert "cat" in result["animals"]
-        assert "dog" in result["animals"]
-        assert "bird" in result["animals"]
+        # Test classification
+        result = await provider.classify_image("https://example.com/cat.jpg")
+        assert "animals" in result
     
     @pytest.mark.asyncio
     async def test_provider_factory_openrouter(self):
         """Test factory creates OpenRouter provider"""
-        from providers import get_vision_provider, OpenRouterVisionProvider
+        from providers import get_vision_provider, OpenRouterProvider
         
         provider = get_vision_provider(
             provider_type="openrouter",
@@ -200,31 +183,18 @@ class TestVisionProviders:
             model="test-model"
         )
         
-        assert isinstance(provider, OpenRouterVisionProvider)
+        assert isinstance(provider, OpenRouterProvider)
         assert provider.api_key == "test-key"
-        assert provider.model == "test-model"
-    
-    @pytest.mark.asyncio
-    async def test_provider_factory_openai(self):
-        """Test factory creates OpenAI provider"""
-        from providers import get_vision_provider, OpenAIVisionProvider
-        
-        provider = get_vision_provider(
-            provider_type="openai",
-            api_key="test-key"
-        )
-        
-        assert isinstance(provider, OpenAIVisionProvider)
-        assert provider.api_key == "test-key"
+        assert provider.vision_model == "test-model"
     
     @pytest.mark.asyncio
     async def test_provider_factory_mock(self):
         """Test factory creates Mock provider"""
-        from providers import get_vision_provider, MockVisionProvider
+        from providers import get_vision_provider, MockProvider
         
         provider = get_vision_provider(provider_type="mock")
         
-        assert isinstance(provider, MockVisionProvider)
+        assert isinstance(provider, MockProvider)
     
     @pytest.mark.asyncio
     async def test_provider_factory_invalid(self):

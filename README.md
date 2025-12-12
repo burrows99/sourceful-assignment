@@ -56,13 +56,57 @@ docker-compose down
 | **Frontend** | http://localhost:3000 | - |
 | **Backend API** | http://localhost:8000 | - |
 | **API Docs** | http://localhost:8000/docs | - |
+| **MinIO Console** | http://localhost:9001 | minioadmin:minioadmin |
+| **MinIO API** | http://localhost:9000 | - |
 | **pgAdmin** | http://localhost:5050 | admin@admin.com:admin |
 
-**Note**: Mock image generation takes ~5 seconds per image to simulate realistic API behavior. Generating 10 images will take approximately 50 seconds.
+**Note**: Images are automatically uploaded to MinIO S3 storage and returned as public HTTP URLs instead of base64 data URLs.
 
 ---
 
 ## API Endpoints
+
+### Image Generation
+
+**POST /generations**
+
+Generate images of random animals asynchronously using AI models. Images are automatically stored in MinIO S3 and returned as public HTTP URLs.
+
+**Request:**
+```json
+{
+  "numImages": 3
+}
+```
+
+**Response:**
+```json
+{
+  "jobId": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "pending"
+}
+```
+
+**GET /generations/{jobId}**
+
+Get job status and generated image URLs.
+
+**Response:**
+```json
+{
+  "jobId": "550e8400-e29b-41d4-a716-446655440000",
+  "status": "completed",
+  "numImages": 3,
+  "animal": "cat",
+  "imageUrls": [
+    "http://localhost:9000/generated-images/jobs/550e8400/image1.png",
+    "http://localhost:9000/generated-images/jobs/550e8400/image2.png",
+    "http://localhost:9000/generated-images/jobs/550e8400/image3.png"
+  ],
+  "createdAt": "2025-12-12T10:30:00Z",
+  "updatedAt": "2025-12-12T10:30:15Z"
+}
+```
 
 ### Image Classification
 
@@ -130,6 +174,73 @@ Then restart: `docker-compose restart backend`
 
 ---
 
+## Image Storage (MinIO S3)
+
+The system uses **MinIO** - an S3-compatible object storage service - to convert base64-encoded images from AI providers into publicly accessible HTTP URLs.
+
+### How It Works
+
+1. **Image Generation**: OpenRouter's Riverflow model generates images as base64 data URLs
+2. **Automatic Upload**: Background worker uploads images to MinIO S3 storage
+3. **Public URLs**: Images are accessible via HTTP URLs (e.g., `http://localhost:9000/generated-images/...`)
+4. **Organized Storage**: Images stored in folders by job ID for easy management
+
+### MinIO Configuration
+
+**Environment Variables** (`.env`):
+```bash
+# Storage backend: "minio" or "none" (keeps base64)
+STORAGE_BACKEND=minio
+
+# MinIO S3 settings
+MINIO_ENDPOINT=minio:9000
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+MINIO_BUCKET=generated-images
+MINIO_PUBLIC_URL=http://localhost:9000
+```
+
+### MinIO Console
+
+Access the MinIO web console at http://localhost:9001
+
+**Login**: `minioadmin` / `minioadmin`
+
+**Features**:
+- Browse uploaded images by job ID
+- View storage usage and metrics
+- Manage buckets and access policies
+- Download or delete images
+- Monitor upload activity
+
+### Storage Structure
+
+```
+generated-images/
+├── jobs/
+│   ├── 550e8400-e29b-41d4-a716-446655440000/
+│   │   ├── abc123.png
+│   │   ├── def456.png
+│   │   └── ghi789.png
+│   └── 661f9511-f3ac-52e5-b827-557766551111/
+│       └── jkl012.png
+└── test/
+    └── validation-images.png
+```
+
+### Disable S3 Storage (Keep Base64)
+
+To return base64 data URLs instead of HTTP URLs:
+
+```bash
+# In .env
+STORAGE_BACKEND=none
+```
+
+Then restart: `docker-compose restart backend`
+
+---
+
 ## Database Visualization (pgAdmin)
 
 1. Open http://localhost:5050
@@ -142,7 +253,7 @@ Then restart: `docker-compose restart backend`
 
 ## Testing
 
-**Coverage**: 51 tests, 86% overall
+**Coverage**: 77 tests, 87% overall
 
 **Test Files:** (organized by type)
 - **Unit Tests:**
@@ -165,9 +276,12 @@ Then restart: `docker-compose restart backend`
 - **Integration (100%)** - End-to-end workflows
 
 **Key Aspects Tested:**
+- ✅ Unified provider architecture (text-to-image + image-to-text)
+- ✅ OpenRouter integration with Riverflow model
 - ✅ Vision classification with multiple providers
-- ✅ Provider factory pattern and switching
+- ✅ Provider factory pattern and easy switching
 - ✅ Mock provider for testing without API costs
+- ✅ Base64 to S3 URL conversion with MinIO
 - ✅ URL validation and error handling
 - ✅ Concurrent job processing with `asyncio.gather()`
 - ✅ Async worker without threading conflicts
@@ -215,12 +329,66 @@ Implemented minimum height constraint for the prompt box to ensure consistent si
 
 ---
 
+## Architecture Highlights
+
+### Unified Provider System
+
+All AI providers extend from a single `BaseProvider` class supporting both capabilities:
+- **Text-to-Image**: Generate images from text prompts
+- **Image-to-Text**: Classify/analyze images
+
+```python
+# Single provider instance for both tasks
+provider = get_provider("openrouter", 
+    api_key="...",
+    image_model="sourceful/riverflow-v2-max-preview",
+    vision_model="openai/gpt-4o-mini"
+)
+
+# Generate images
+images = await provider.generate_images("a cute cat", 3)
+
+# Classify images
+result = await provider.classify_image(images[0])
+```
+
+**Benefits**:
+- Single configuration for all AI tasks
+- Easy to add new providers
+- Consistent error handling
+- Simplified testing
+
+### Storage Service Architecture
+
+**Abstraction Layer**: Worker doesn't need to know about storage implementation
+
+```python
+# Worker simply generates images
+image_urls = await provider.generate_images(prompt, num_images)
+
+# Storage service handles conversion automatically
+if settings.STORAGE_BACKEND == "minio":
+    image_urls = storage_service.upload_multiple_base64_images(image_urls)
+```
+
+**Flexibility**: Switch between base64 and S3 URLs with a config change
+
+### Async Background Processing
+
+- **AsyncIO-based**: No threading, pure async/await
+- **Database Pooling**: Efficient connection management
+- **Error Recovery**: Jobs marked as failed with error messages
+- **Concurrent Processing**: Multiple jobs processed in parallel
+
+---
+
 ## Troubleshooting
 
 ```bash
 # View container logs
 docker logs sourceful-backend -f
 docker logs sourceful-frontend -f
+docker logs sourceful-minio -f
 
 # Rebuild containers
 docker-compose build --no-cache
@@ -228,4 +396,26 @@ docker-compose up -d
 
 # Check container status
 docker ps
+
+# Reset MinIO storage
+docker-compose down -v
+docker-compose up -d
 ```
+
+### Common Issues
+
+**Images not uploading to MinIO**:
+```bash
+# Check MinIO is running
+docker ps | grep minio
+
+# Check MinIO logs
+docker logs sourceful-minio
+
+# Verify bucket exists
+curl http://localhost:9000/minio/health/live
+```
+
+**Base64 URLs instead of HTTP URLs**:
+- Check `STORAGE_BACKEND=minio` in `.env`
+- Restart backend: `docker-compose restart backend`

@@ -9,6 +9,7 @@ from providers import get_image_provider
 from config import settings
 from core.database import sessionmanager
 from repositories.job_repository import JobRepository
+from storage import storage_service
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -36,7 +37,15 @@ class AsyncImageWorker:
             poll_interval: Time in seconds between polling for new jobs
         """
         self.poll_interval = poll_interval if poll_interval is not None else settings.WORKER_POLL_INTERVAL
-        self.provider = get_image_provider(delay_seconds=settings.IMAGE_PROVIDER_DELAY)
+        self.provider = get_image_provider(
+            provider_type=settings.IMAGE_PROVIDER,
+            api_key=settings.OPENROUTER_API_KEY,
+            model=settings.IMAGE_MODEL,
+            site_url=settings.OPENROUTER_SITE_URL,
+            site_name=settings.OPENROUTER_SITE_NAME,
+            timeout=settings.IMAGE_TIMEOUT,
+            delay_seconds=settings.IMAGE_PROVIDER_DELAY
+        )
         self._task: Optional[asyncio.Task] = None
         self._running = False
     
@@ -115,8 +124,17 @@ class AsyncImageWorker:
                 
                 logger.info(f"🐾 Job {job_id} - selected animal: {animal}")
                 
-                # Generate images using the provider
+                # Generate images using the provider (returns base64 data URLs)
                 image_urls = await self.provider.generate_images(prompt, job.numImages)
+                
+                # Convert base64 data URLs to public HTTP URLs via MinIO S3
+                if settings.STORAGE_BACKEND == "minio":
+                    logger.info(f"📦 Job {job_id} - uploading {len(image_urls)} images to S3")
+                    image_urls = storage_service.upload_multiple_base64_images(
+                        image_urls,
+                        prefix=f"jobs/{job_id}"
+                    )
+                    logger.info(f"✅ Job {job_id} - images uploaded successfully")
                 
                 # Update job with results
                 await repository.update(

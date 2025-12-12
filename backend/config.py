@@ -40,8 +40,11 @@ class Settings(BaseSettings):
     # Worker Settings
     WORKER_POLL_INTERVAL: float = 1.0
     
-    # Provider Settings (5 seconds simulates realistic image generation API)
-    IMAGE_PROVIDER_DELAY: float = 5.0
+    # Image Generation Provider Settings
+    IMAGE_PROVIDER: str = "openrouter"  # Options: openrouter, mock
+    IMAGE_MODEL: str = "sourceful/riverflow-v2-max-preview"
+    IMAGE_TIMEOUT: float = 60.0
+    IMAGE_PROVIDER_DELAY: float = 2.0  # Only for mock provider
     
     # Vision Provider Settings
     VISION_PROVIDER: str = "openrouter"  # Options: openrouter, openai, mock
@@ -55,6 +58,17 @@ class Settings(BaseSettings):
     
     # OpenAI Settings (when VISION_PROVIDER=openai)
     OPENAI_API_KEY: str = ""
+    
+    # MinIO S3 Storage Settings
+    MINIO_ENDPOINT: str = "minio:9000"
+    MINIO_ACCESS_KEY: str = "minioadmin"
+    MINIO_SECRET_KEY: str = "minioadmin"
+    MINIO_BUCKET: str = "generated-images"
+    MINIO_PUBLIC_URL: str = "http://localhost:9000"
+    MINIO_SECURE: bool = False  # Use HTTPS
+    
+    # Storage Settings
+    STORAGE_BACKEND: str = "minio"  # Options: "minio", "none" (keeps base64)
     
     # Job Settings
     MIN_IMAGES_PER_JOB: int = 1
