@@ -43,6 +43,19 @@ class Settings(BaseSettings):
     # Provider Settings (5 seconds simulates realistic image generation API)
     IMAGE_PROVIDER_DELAY: float = 5.0
     
+    # Vision Provider Settings
+    VISION_PROVIDER: str = "openrouter"  # Options: openrouter, openai, mock
+    VISION_MODEL: str = ""  # Empty uses provider default, or specify like "openai/gpt-4o-mini"
+    VISION_TIMEOUT: float = 30.0
+    
+    # OpenRouter Settings (when VISION_PROVIDER=openrouter)
+    OPENROUTER_API_KEY: str = ""
+    OPENROUTER_SITE_URL: str = "http://localhost:8000"
+    OPENROUTER_SITE_NAME: str = "Image Classification API"
+    
+    # OpenAI Settings (when VISION_PROVIDER=openai)
+    OPENAI_API_KEY: str = ""
+    
     # Job Settings
     MIN_IMAGES_PER_JOB: int = 1
     MAX_IMAGES_PER_JOB: int = 10

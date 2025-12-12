@@ -7,6 +7,10 @@ Full-stack image generation application with FastAPI backend, Next.js frontend, 
 ## Quick Start
 
 ```bash
+# Copy environment file and add your OpenRouter API key
+cp .env.example .env
+# Edit .env and set OPENROUTER_API_KEY
+
 # Start all services (migrations run automatically on backend start)
 docker-compose up -d
 
@@ -55,6 +59,74 @@ docker-compose down
 | **pgAdmin** | http://localhost:5050 | admin@admin.com:admin |
 
 **Note**: Mock image generation takes ~5 seconds per image to simulate realistic API behavior. Generating 10 images will take approximately 50 seconds.
+
+---
+
+## API Endpoints
+
+### Image Classification
+
+**POST /classify**
+
+Classify animals in an image using AI vision models. The system supports multiple providers with easy switching via configuration.
+
+**Request:**
+```json
+{
+  "imgUrl": "https://example.com/animal-image.jpg"
+}
+```
+
+**Response:**
+```json
+{
+  "animals": ["cat", "dog"],
+  "error": null
+}
+```
+
+**Example with cURL:**
+```bash
+curl -X POST http://localhost:8000/classify \
+  -H "Content-Type: application/json" \
+  -d '{"imgUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg"}'
+```
+
+### Supported Vision Providers
+
+The classification endpoint uses an **extensible provider system** that allows easy switching between AI services:
+
+| Provider | Configuration | API Key Required | Models Available |
+|----------|--------------|------------------|------------------|
+| **OpenRouter** | `VISION_PROVIDER=openrouter` | Yes ([Get key](https://openrouter.ai/keys)) | GPT-4o, GPT-4o-mini, Claude, Gemini, etc. |
+| **OpenAI** | `VISION_PROVIDER=openai` | Yes ([Get key](https://platform.openai.com/api-keys)) | GPT-4o, GPT-4o-mini |
+| **Mock** | `VISION_PROVIDER=mock` | No | Pattern-based (for testing) |
+
+**Switching Providers:**
+
+Edit `.env` and set `VISION_PROVIDER`:
+```bash
+# Use OpenRouter (default, multiple models available)
+VISION_PROVIDER=openrouter
+VISION_MODEL=openai/gpt-4o-mini
+OPENROUTER_API_KEY=sk-or-v1-your-key
+
+# Use OpenAI directly
+VISION_PROVIDER=openai
+VISION_MODEL=gpt-4o-mini
+OPENAI_API_KEY=sk-your-key
+
+# Use mock for testing (no API key needed)
+VISION_PROVIDER=mock
+```
+
+Then restart: `docker-compose restart backend`
+
+**See [PROVIDER_ARCHITECTURE.md](PROVIDER_ARCHITECTURE.md) for:**
+- Adding new providers (Anthropic, Google, etc.)
+- Custom model configuration
+- Fallback strategies
+- Architecture details
 
 ---
 

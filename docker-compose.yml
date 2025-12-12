@@ -49,6 +49,13 @@ services:
       - /app/venv
     environment:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/postgres
+      - VISION_PROVIDER=${VISION_PROVIDER:-openrouter}
+      - VISION_MODEL=${VISION_MODEL:-}
+      - VISION_TIMEOUT=${VISION_TIMEOUT:-30.0}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - OPENROUTER_SITE_URL=${OPENROUTER_SITE_URL:-http://localhost:8000}
+      - OPENROUTER_SITE_NAME=${OPENROUTER_SITE_NAME:-Image Classification API}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
     networks:
       - sourceful-network
     restart: unless-stopped

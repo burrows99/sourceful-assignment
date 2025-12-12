@@ -3,13 +3,19 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List
 
-from models import GenerationRequest, GenerationResponse, JobDetailResponse
+from models import GenerationRequest, GenerationResponse, JobDetailResponse, ClassifyRequest, ClassifyResponse
 from services import GenerationService
 from core.database import get_db
+from providers import get_vision_provider
+from config import settings
 
 router = APIRouter(
     prefix="/generations",
     tags=["generations"]
+)
+
+classify_router = APIRouter(
+    tags=["classification"]
 )
 
 
@@ -78,3 +84,71 @@ async def list_generations(db: AsyncSession = Depends(get_db)):
     """
     service = GenerationService(db)
     return await service.list_jobs()
+
+
+@classify_router.post("/classify", response_model=ClassifyResponse)
+async def classify_image(request: ClassifyRequest):
+    """
+    Classify animals in an image using vision AI
+    
+    Uses a vision language model to identify animals in the provided image.
+    If no animals are detected, returns an empty list with an error message.
+    
+    The provider is configurable via environment variables:
+    - VISION_PROVIDER: "openrouter", "openai", or "mock"
+    - VISION_MODEL: Specific model to use (optional, uses provider default)
+    
+    Args:
+        request: Request body containing imgUrl
+        
+    Returns:
+        List of animals detected and optional error message
+    """
+    # Validate URL format
+    if not request.imgUrl.startswith(("http://", "https://")):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid image URL. Must start with http:// or https://"
+        )
+    
+    # Determine API key based on provider
+    provider_type = settings.VISION_PROVIDER.lower()
+    
+    if provider_type == "mock":
+        api_key = ""  # Mock doesn't need an API key
+    elif provider_type == "openrouter":
+        api_key = settings.OPENROUTER_API_KEY
+        if not api_key:
+            raise HTTPException(
+                status_code=500,
+                detail="OpenRouter API key not configured. Please set OPENROUTER_API_KEY in environment variables."
+            )
+    elif provider_type == "openai":
+        api_key = settings.OPENAI_API_KEY
+        if not api_key:
+            raise HTTPException(
+                status_code=500,
+                detail="OpenAI API key not configured. Please set OPENAI_API_KEY in environment variables."
+            )
+    else:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Unknown vision provider: {provider_type}. Supported: openrouter, openai, mock"
+        )
+    
+    # Get vision provider and classify image
+    provider = get_vision_provider(
+        provider_type=provider_type,
+        api_key=api_key,
+        model=settings.VISION_MODEL,
+        site_url=settings.OPENROUTER_SITE_URL,
+        site_name=settings.OPENROUTER_SITE_NAME,
+        timeout=settings.VISION_TIMEOUT
+    )
+    
+    result = await provider.classify_image(request.imgUrl)
+    
+    return ClassifyResponse(
+        animals=result.get("animals", []),
+        error=result.get("error")
+    )

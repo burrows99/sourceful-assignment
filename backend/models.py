@@ -47,3 +47,27 @@ class JobDetailResponse(BaseModel):
     error: Optional[str] = None
     createdAt: str
     updatedAt: str
+
+
+class ClassifyRequest(BaseModel):
+    imgUrl: str
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "imgUrl": "https://example.com/image.jpg"
+            }
+        }
+
+
+class ClassifyResponse(BaseModel):
+    animals: List[str]
+    error: Optional[str] = None
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "animals": ["cat", "dog"],
+                "error": None
+            }
+        }

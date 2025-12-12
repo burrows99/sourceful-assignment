@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from config import settings
-from routes import router as generations_router
+from routes import router as generations_router, classify_router
 from workers.async_worker import worker
 from core.database import sessionmanager
 
@@ -77,6 +77,7 @@ def create_application() -> FastAPI:
 
     # Register routers
     app.include_router(generations_router)
+    app.include_router(classify_router)
 
     # Root endpoints
     @app.get("/", tags=["root"])
