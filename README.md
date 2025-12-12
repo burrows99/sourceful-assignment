@@ -143,7 +143,6 @@ The classification endpoint uses an **extensible provider system** that allows e
 | Provider | Configuration | API Key Required | Models Available |
 |----------|--------------|------------------|------------------|
 | **OpenRouter** | `VISION_PROVIDER=openrouter` | Yes ([Get key](https://openrouter.ai/keys)) | GPT-4o, GPT-4o-mini, Claude, Gemini, etc. |
-| **OpenAI** | `VISION_PROVIDER=openai` | Yes ([Get key](https://platform.openai.com/api-keys)) | GPT-4o, GPT-4o-mini |
 | **Mock** | `VISION_PROVIDER=mock` | No | Pattern-based (for testing) |
 
 **Switching Providers:**
@@ -155,22 +154,11 @@ VISION_PROVIDER=openrouter
 VISION_MODEL=openai/gpt-4o-mini
 OPENROUTER_API_KEY=sk-or-v1-your-key
 
-# Use OpenAI directly
-VISION_PROVIDER=openai
-VISION_MODEL=gpt-4o-mini
-OPENAI_API_KEY=sk-your-key
-
 # Use mock for testing (no API key needed)
 VISION_PROVIDER=mock
 ```
 
 Then restart: `docker-compose restart backend`
-
-**See [PROVIDER_ARCHITECTURE.md](PROVIDER_ARCHITECTURE.md) for:**
-- Adding new providers (Anthropic, Google, etc.)
-- Custom model configuration
-- Fallback strategies
-- Architecture details
 
 ---
 
@@ -272,7 +260,7 @@ Then restart: `docker-compose restart backend`
 - **Services (100%)** - Business logic (job creation, status updates)
 - **Repositories (100%)** - Database operations (CRUD, queries)
 - **Workers (82%)** - Async job processing (concurrent execution)
-- **Providers (69%)** - Vision provider system (OpenRouter, OpenAI, Mock)
+- **Providers (69%)** - Unified provider system (OpenRouter, Mock)
 - **Integration (100%)** - End-to-end workflows
 
 **Key Aspects Tested:**
