@@ -142,16 +142,33 @@ Then restart: `docker-compose restart backend`
 
 ## Testing
 
-**Coverage**: 28 tests, 93% overall
+**Coverage**: 51 tests, 86% overall
+
+**Test Files:** (organized by type)
+- **Unit Tests:**
+  - `test_routes_unit.py` - API endpoint tests
+  - `test_services_unit.py` - Business logic tests
+  - `test_repository_unit.py` - Database operation tests
+  - `test_classify_unit.py` - Vision classification unit tests (22 tests)
+
+- **Integration Tests:**
+  - `test_worker_integration.py` - Async worker tests
+  - `test_integration_e2e.py` - End-to-end workflow tests
+  - `test_classify_integration.py` - Classification integration tests (7 tests)
 
 **Test Coverage by Component:**
-- **Routes (95%)** - API endpoints (create job, get job, list jobs)
-- **Services (96%)** - Business logic (job creation, status updates)
+- **Routes (87%)** - API endpoints (create job, get job, list jobs, classify)
+- **Services (100%)** - Business logic (job creation, status updates)
 - **Repositories (100%)** - Database operations (CRUD, queries)
-- **Workers (82%)** - Async job processing (concurrent job execution, image generation)
-- **Integration (100%)** - End-to-end workflows (job creation → parallel processing → completion)
+- **Workers (82%)** - Async job processing (concurrent execution)
+- **Providers (69%)** - Vision provider system (OpenRouter, OpenAI, Mock)
+- **Integration (100%)** - End-to-end workflows
 
 **Key Aspects Tested:**
+- ✅ Vision classification with multiple providers
+- ✅ Provider factory pattern and switching
+- ✅ Mock provider for testing without API costs
+- ✅ URL validation and error handling
 - ✅ Concurrent job processing with `asyncio.gather()`
 - ✅ Async worker without threading conflicts
 - ✅ Database session management with connection pooling
@@ -169,6 +186,10 @@ open backend/htmlcov/index.html
 # Run specific test types
 docker exec sourceful-backend pytest -m unit
 docker exec sourceful-backend pytest -m integration
+
+# Run specific test files
+docker exec sourceful-backend pytest tests/test_classify_unit.py
+docker exec sourceful-backend pytest tests/test_classify_integration.py
 ```
 
 ---
